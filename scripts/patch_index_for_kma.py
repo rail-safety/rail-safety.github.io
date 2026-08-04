@@ -7,10 +7,14 @@ import re
 index_path = Path("index.html")
 app_path = Path("app.js")
 styles_path = Path("styles.css")
+refresh_path = Path("refresh.css")
+typography_path = Path("typography-fix.css")
 
 index = index_path.read_text(encoding="utf-8")
 app = app_path.read_text(encoding="utf-8")
 styles = styles_path.read_text(encoding="utf-8")
+refresh = refresh_path.read_text(encoding="utf-8")
+typography = typography_path.read_text(encoding="utf-8")
 
 # 근무역 버튼은 한 줄에 들어가는 짧은 명칭과 고정 순서를 유지한다.
 station_buttons = '''<div class="station-grid" id="stationButtons" aria-label="근무역 선택">
@@ -33,6 +37,7 @@ if station_count != 1:
 # 정시 예보 기준 근무시간과 최신 정적 파일 버전을 유지한다.
 index = index.replace("18:10~익일 09:00", "18:00~익일 08:00")
 index = re.sub(r'href="styles\.css(?:\?v=[^"]+)?"', 'href="styles.css?v=20260805-0900"', index, count=1)
+index = re.sub(r'href="refresh\.css(?:\?v=[^"]+)?"', 'href="refresh.css?v=20260805-0905"', index, count=1)
 index = re.sub(r'src="app\.js(?:\?v=[^"]+)?"', 'src="app.js?v=20260805-0900"', index, count=1)
 
 # 공통 안전정보는 오늘 컨디션 확인만 기본 펼침으로 시작한다.
@@ -63,6 +68,7 @@ required_markers = {
         'data-station="boseong"',
         '18:00~익일 08:00',
         'styles.css?v=20260805-0900',
+        'refresh.css?v=20260805-0905',
         'app.js?v=20260805-0900',
         '<details class="info-block" open>',
         'id="conditionResult" aria-live="polite" hidden',
@@ -83,13 +89,31 @@ required_markers = {
         '.info-block:nth-child(4)[open]',
         '/* precision-density-patch:end */',
     ),
+    "refresh.css": (
+        '@import url("typography-fix.css?v=20260805-0905")',
+        '.hero__refresh',
+    ),
+    "typography-fix.css": (
+        'word-break: keep-all',
+        'line-break: strict',
+        '.support-panel li',
+        '.details-content li',
+    ),
+}
+
+sources = {
+    "index.html": index,
+    "app.js": app,
+    "styles.css": styles,
+    "refresh.css": refresh,
+    "typography-fix.css": typography,
 }
 
 for filename, markers in required_markers.items():
-    source = {"index.html": index, "app.js": app, "styles.css": styles}[filename]
+    source = sources[filename]
     missing = [marker for marker in markers if marker not in source]
     if missing:
         raise SystemExit(f"{filename} UI 구조 검증 실패: " + ", ".join(missing))
 
 index_path.write_text(index, encoding="utf-8")
-print("최신 모바일 UI 구조와 기상 갱신 호환성을 확인했습니다.")
+print("최신 모바일 UI 구조와 한글 줄바꿈, 기상 갱신 호환성을 확인했습니다.")
