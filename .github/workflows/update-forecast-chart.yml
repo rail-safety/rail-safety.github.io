@@ -1,0 +1,40 @@
+name: Update forecast chart
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/update-forecast-chart.yml'
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update page
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('<div class="section-label">근무시간 예보</div><h2>남은 근무시간 전망</h2>','<h2>오늘 날씨 예보</h2>')
+          s=s.replace("{min:-99,key:'normal',name:'일반',color:'#26834a'}","{min:-99,key:'normal',name:'안전',color:'#26834a'}")
+          old='.forecast{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:14px;overflow:auto}.hour{min-width:96px;background:#f7f9fa;border:1px solid var(--line);border-radius:13px;padding:10px;text-align:center}.hour strong{display:block;font-size:19px}.hour.hot{border:2px solid var(--level);background:#fff7f3}'
+          new='.forecast{display:flex;align-items:flex-end;gap:10px;margin-top:18px;padding:18px 10px 8px;min-height:245px;overflow-x:auto;border-left:1px solid var(--line);border-bottom:1px solid var(--line);background:linear-gradient(to top,#f7f9fa 0,#fff 100%)}.hour{min-width:76px;height:210px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;text-align:center}.hour-time{font-size:12px;color:var(--muted);margin-top:7px;white-space:nowrap}.hour-bar{width:48px;height:var(--bar-height);min-height:18px;border-radius:12px 12px 4px 4px;background:var(--level);display:flex;align-items:flex-start;justify-content:center;padding-top:7px;color:#fff;font-weight:900;box-shadow:0 5px 12px #24374622;transition:.25s}.hour-level{font-size:12px;font-weight:900;color:var(--level);margin-top:4px}.hour.hot .hour-bar{outline:3px solid color-mix(in srgb,var(--level) 24%,transparent)}'
+          if old not in s:
+              raise SystemExit('forecast css pattern not found')
+          s=s.replace(old,new)
+          old_func="function renderForecast(){const now=new Date();const rows=state.hourly.filter(x=>{const d=new Date(x.time);return d>=new Date(now.getTime()-3600000)&&isInShift(d)}).slice(0,12);forecast.innerHTML=rows.map(x=>{const d=new Date(x.time),lv=getLevel(x.hi);return `<div class=\"hour ${x.hi>=35?'hot':''}\" style=\"--level:${lv.color}\"><span>${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}시</span><strong style=\"color:${lv.color}\">${x.hi.toFixed(1)}℃</strong><small>${lv.name}</small></div>`}).join('')||'<div class=\"hint\">선택한 근무시간의 남은 예보가 없습니다.</div>'}"
+          new_func="function renderForecast(){const now=new Date();const rows=state.hourly.filter(x=>{const d=new Date(x.time);return d>=new Date(now.getTime()-3600000)&&isInShift(d)}).slice(0,12);forecast.innerHTML=rows.map(x=>{const d=new Date(x.time),lv=getLevel(x.hi),height=Math.max(28,Math.min(165,(x.hi-24)*11));return `<div class=\"hour ${x.hi>=35?'hot':''}\" style=\"--level:${lv.color};--bar-height:${height}px\"><div class=\"hour-bar\">${x.hi.toFixed(1)}°</div><div class=\"hour-level\">${lv.name}</div><div class=\"hour-time\">${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}시</div></div>`}).join('')||'<div class=\"hint\">선택한 근무시간의 남은 예보가 없습니다.</div>'}"
+          if old_func not in s:
+              raise SystemExit('renderForecast pattern not found')
+          s=s.replace(old_func,new_func)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add index.html
+          git commit -m "오늘 날씨 예보 그래프형으로 개선" || exit 0
+          git push
