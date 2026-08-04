@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""기상 갱신 전 화면 구조를 검증하고 근무시간 예보 표시를 일관되게 유지한다."""
+"""기상 갱신 전 화면 구조와 현장용 표시 밀도를 일관되게 유지한다."""
 
 from pathlib import Path
 import re
@@ -30,8 +30,8 @@ if station_count != 1:
     raise SystemExit("index.html의 근무역 버튼 영역을 찾지 못했습니다.")
 
 index = index.replace("18:10~익일 09:00", "18:00~익일 08:00")
-index = re.sub(r'href="styles\.css(?:\?v=[^"]+)?"', 'href="styles.css?v=20260805-0815"', index, count=1)
-index = re.sub(r'src="app\.js(?:\?v=[^"]+)?"', 'src="app.js?v=20260805-0815"', index, count=1)
+index = re.sub(r'href="styles\.css(?:\?v=[^"]+)?"', 'href="styles.css?v=20260805-0830"', index, count=1)
+index = re.sub(r'src="app\.js(?:\?v=[^"]+)?"', 'src="app.js?v=20260805-0830"', index, count=1)
 
 shift_functions = '''function getShiftWindow(now = new Date()) {
   const start = new Date(now);
@@ -84,105 +84,97 @@ if shift_count != 1:
 app = app.replace('  const firstDate = new Date(rows[0].time);\n', '')
 app = app.replace('const timeLabel = formatForecastHour(date, firstDate);', 'const timeLabel = formatForecastHour(date);')
 
-compact_css = '''/* compact-density-patch:start */
-.hero__action {
-  margin-top: 20px;
-  padding-top: 16px;
-}
-.hero__action-label {
-  margin-bottom: 2px;
-  font-size: 13px;
-}
-.hero__action p:last-child {
-  font-size: clamp(17px, 4.7vw, 19px);
-  line-height: 1.42;
-  font-weight: 620;
-}
-.hero__meta {
-  margin-top: 14px;
-}
-.forecast-advice,
-.emergency-banner,
-.condition-result {
-  border-left: 0;
-}
-.forecast-advice {
-  padding: 12px 13px;
-  background: rgb(255 255 255 / 72%);
-}
-.emergency-banner,
-.condition-result {
-  background: #f5f7f8;
-}
-.hourly-block {
-  margin-top: 18px;
-}
-.hourly-block__title {
-  margin-bottom: 6px;
-}
+color_patch = r'''/* semantic-color-patch:start */
+/* 시간별 전망은 글자색보다 행 전체의 연한 상태면으로 흐름을 전달한다. */
 .forecast-grid {
-  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 3px;
+  border-top: 0;
 }
 .forecast-item {
-  grid-template-columns: 48px minmax(0, 1fr) auto;
-  gap: 8px;
-  min-height: 38px;
-  padding: 3px 2px;
+  border-bottom: 0;
+  border-radius: 9px;
+  background: var(--item-risk-soft);
+}
+.forecast-item[data-current="true"] {
+  background: color-mix(in srgb, var(--item-risk-soft) 76%, var(--brand-100));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--item-risk) 30%, transparent);
 }
 .forecast-time {
-  font-size: 14px;
-  font-weight: 620;
-}
-.forecast-track {
-  gap: 7px;
+  color: var(--text-strong);
 }
 .forecast-level {
-  gap: 5px;
-  font-size: 12px;
-  font-weight: 650;
+  color: var(--text);
 }
-.forecast-level::before {
-  width: 7px;
-  height: 7px;
+.forecast-track::after {
+  background: color-mix(in srgb, var(--item-risk) 18%, var(--line));
 }
 .forecast-temp {
-  min-width: 60px;
-  padding: 4px 8px;
-  font-size: 15px;
-  font-weight: 700;
+  background: rgb(255 255 255 / 66%);
+  color: var(--text-strong);
 }
-@media (max-width: 380px) {
-  .forecast-item {
-    grid-template-columns: 44px minmax(0, 1fr) auto;
-    gap: 6px;
-    min-height: 36px;
-  }
-  .forecast-time { font-size: 13px; }
-  .forecast-level { font-size: 11px; }
-  .forecast-temp {
-    min-width: 56px;
-    padding-inline: 7px;
-    font-size: 14px;
-  }
+
+/* 건강정보는 목적별 의미색을 사용하되 내용보다 강하지 않게 표현한다. */
+.info-list {
+  display: grid;
+  gap: 8px;
 }
-/* compact-density-patch:end */'''
+.info-block {
+  border-top: 0;
+  border-radius: 13px;
+  overflow: clip;
+  background: var(--info-soft, #f5f7f8);
+}
+.info-block:nth-child(1) { --info-color: var(--brand-800); --info-soft: #edf5fb; }
+.info-block:nth-child(2) { --info-color: #087b78; --info-soft: #eaf7f5; }
+.info-block:nth-child(3) { --info-color: #a75b00; --info-soft: #fff4e5; }
+.info-block:nth-child(4) { --info-color: #b52a2a; --info-soft: #fff0f0; }
+.info-block summary {
+  min-height: 54px;
+  padding-inline: 14px 44px;
+  color: var(--text-strong);
+}
+.info-block summary::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 9px;
+  height: 9px;
+  margin-right: 10px;
+  border-radius: 50%;
+  background: var(--info-color);
+}
+.info-block summary::after {
+  right: 14px;
+  color: var(--info-color);
+}
+.details-content {
+  padding: 0 14px 16px;
+}
+.info-block[open] summary {
+  color: var(--info-color);
+}
+.emergency-banner {
+  background: #fff0f0;
+  color: #7b2020;
+}
+.condition-result {
+  background: color-mix(in srgb, var(--condition-color) 8%, #fff);
+}
+/* semantic-color-patch:end */'''
+
 styles = re.sub(
-    r'/\* compact-density-patch:start \*/.*?/\* compact-density-patch:end \*/',
-    compact_css,
+    r'/\* semantic-color-patch:start \*/.*?/\* semantic-color-patch:end \*/',
+    '',
     styles,
-    count=1,
     flags=re.S,
-)
-if "/* compact-density-patch:start */" not in styles:
-    styles = styles.rstrip() + "\n\n" + compact_css + "\n"
+).rstrip() + "\n\n" + color_patch + "\n"
 
 required_markers = {
     "index.html": (
         'data-station="suncheon"',
-        'data-station="gurye"',
         '18:00~익일 08:00',
-        'styles.css?v=20260805-0815',
-        'app.js?v=20260805-0815',
+        'styles.css?v=20260805-0830',
+        'app.js?v=20260805-0830',
         'id="forecast"',
     ),
     "app.js": (
@@ -194,8 +186,9 @@ required_markers = {
     "styles.css": (
         "/* hourly-list-patch:start */",
         "/* compact-density-patch:start */",
-        ".forecast-track",
-        "repeat(5",
+        "/* semantic-color-patch:start */",
+        ".info-block:nth-child(4)",
+        "background: var(--item-risk-soft)",
     ),
 }
 
@@ -208,4 +201,4 @@ for filename, markers in required_markers.items():
 index_path.write_text(index, encoding="utf-8")
 app_path.write_text(app, encoding="utf-8")
 styles_path.write_text(styles, encoding="utf-8")
-print("히어로 행동문구와 시간별 전망 밀도를 개선했습니다.")
+print("시간별 전망 상태면과 건강정보 의미색을 반영했습니다.")
