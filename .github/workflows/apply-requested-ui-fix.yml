@@ -1,0 +1,55 @@
+name: Apply requested UI fix
+
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-requested-ui-fix.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch-index:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Patch index.html
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          text = text.replace(
+              '<section class="card"><div class="section-label">근무역 선택</div><h2>역 주변 기상값이 자동으로 바뀝니다</h2><div class="station-grid" id="stations"></div><div class="weather-box"><div><div class="weather-title" id="weatherTitle">순천역 인근 자동값</div>',
+              '<section class="card"><h2>근무역 선택</h2><div class="station-grid" id="stations"></div><div class="weather-box"><div><div class="weather-title" id="weatherTitle">기상청 예보 기준 체감온도</div>'
+          )
+
+          text = text.replace(
+              "const stationData={suncheon:{name:'순천역',lat:34.9456,lon:127.5022},boseong:{name:'보성역',lat:34.7634,lon:127.0802},beolgyo:{name:'벌교역',lat:34.8443,lon:127.3422},gokseong:{name:'곡성역',lat:35.2820,lon:127.2916},gurye:{name:'구례구역',lat:35.1632,lon:127.4511}};",
+              "const stationData={suncheon:{name:'순천역',lat:34.9456,lon:127.5022},gokseong:{name:'곡성역',lat:35.2820,lon:127.2916},gurye:{name:'구례구역',lat:35.1632,lon:127.4511},beolgyo:{name:'벌교역',lat:34.8443,lon:127.3422},boseong:{name:'보성역',lat:34.7634,lon:127.0802}};"
+          )
+
+          text = text.replace(
+              "async function loadWeather(){const s=stationData[state.station];weatherTitle.textContent=`${s.name} 인근 자동값`;",
+              "async function loadWeather(){const s=stationData[state.station];weatherTitle.textContent='기상청 예보 기준 체감온도';"
+          )
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No changes needed"
+          else
+            git commit -m "근무역 선택 영역 문구 및 순서 수정"
+            git push
+          fi
