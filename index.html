@@ -3,271 +3,295 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#004f8f" />
+  <meta name="theme-color" content="#f2f5f7" />
   <meta name="color-scheme" content="light" />
   <title>순천관리역 폭염 안전 가이드</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <a class="skip-link" href="#main-content">본문 바로가기</a>
-  <header class="app-header">
-    <div class="header-inner">
-      <div class="brand-block">
-        <p class="system-name"><span class="system-mark" aria-hidden="true"></span>순천관리역 · 내부 안전시스템</p>
-        <h1 class="app-title">폭염 안전 가이드</h1>
+
+  <header class="page-header">
+    <div class="shell page-header__inner">
+      <div>
+        <p class="brand-label">KORAIL · 순천관리역</p>
+        <h1>폭염 안전 가이드</h1>
       </div>
-      <div class="header-status" aria-label="기상청 자료 연동 상태">
-        <span class="status-dot" aria-hidden="true"></span><span id="headerStatus">기상 연동 중</span>
-      </div>
+      <a class="weather-link" href="https://www.weather.go.kr" target="_blank" rel="noopener noreferrer">
+        <span>기상청 날씨</span>
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M8 16 16 8M9 8h7v7" /></svg>
+      </a>
     </div>
   </header>
 
-  <main id="main-content">
-    <div class="section-stack">
-      <section class="card status-card" aria-labelledby="current-status-title">
-        <div class="status-toolbar">
-          <div class="station-field">
-            <label for="stationSelect">근무역</label>
-            <div class="select-wrap">
-              <select class="station-select" id="stationSelect">
-                <option value="suncheon">순천역</option>
-                <option value="gokseong">곡성역</option>
-                <option value="gurye">구례구역</option>
-                <option value="beolgyo">벌교역</option>
-                <option value="boseong">보성역</option>
-              </select>
-            </div>
-          </div>
-          <a class="weather-link" href="https://www.weather.go.kr" target="_blank" rel="noopener noreferrer">기상청 상세 날씨</a>
-        </div>
-        <div class="status-main">
-          <div class="status-main-grid">
-            <div>
-              <p class="status-label" id="current-status-title">현재 체감온도 · 기상청 초단기실황</p>
-              <div class="temperature-row">
-                <div class="current-temperature" id="currentTemp" aria-live="polite">--℃</div>
-                <div class="risk-badge" id="currentBadge">
-                  <span class="risk-symbol" aria-hidden="true">·</span>
-                  <span>확인 중</span>
-                </div>
-              </div>
-              <p class="weather-meta" id="weatherMeta">현재 기상정보를 불러오고 있습니다.</p>
-            </div>
-            <div class="primary-action" aria-live="polite">
-              <p class="primary-action-label">현재 단계 핵심 조치</p>
-              <p class="primary-action-text" id="currentAction">기상정보 확인 후 핵심 행동을 안내합니다.</p>
-              <p class="updated-line" id="updated">최근 갱신정보 확인 중</p>
-            </div>
-          </div>
-        </div>
-      </section>
+  <main id="main-content" class="shell">
+    <section class="station-section" aria-labelledby="station-title">
+      <div class="section-inline-heading">
+        <h2 id="station-title">근무역 선택</h2>
+        <p>선택한 역의 기상값으로 자동 갱신</p>
+      </div>
+      <div class="station-grid" id="stationButtons" aria-label="근무역 선택">
+        <button type="button" data-station="suncheon" aria-pressed="true">순천역</button>
+        <button type="button" data-station="boseong" aria-pressed="false">보성역</button>
+        <button type="button" data-station="beolgyo" aria-pressed="false">벌교역</button>
+        <button type="button" data-station="gokseong" aria-pressed="false">곡성역</button>
+        <button type="button" data-station="gurye" aria-pressed="false">구례구역</button>
+      </div>
+    </section>
 
-      <section class="card action-card" aria-labelledby="action-title">
-        <div class="card-body">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">현장 업무 지침</p>
-              <h2 class="section-title" id="action-title">지금 해야 할 행동</h2>
-              <p class="section-description">적용 기준과 담당 직무를 선택하면 현재 단계 지침이 즉시 표시됩니다.</p>
-            </div>
-          </div>
-
-          <div class="action-controls">
-            <div class="control-group">
-              <span class="control-label">행동지침 적용 기준</span>
-              <div class="segmented" aria-label="행동지침 적용 기준">
-                <button class="segment-button" type="button" data-source="auto" aria-pressed="true">기상 자동값</button>
-                <button class="segment-button" type="button" data-source="field" aria-pressed="false">현장 입력값</button>
-              </div>
-            </div>
-            <div class="control-group">
-              <span class="control-label">담당 직무</span>
-              <div class="segmented job-segment" aria-label="담당 직무">
-                <button class="segment-button" type="button" data-job="yard" aria-pressed="true">수송</button>
-                <button class="segment-button" type="button" data-job="platform" aria-pressed="false">홈안내</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="guide-summary" aria-live="polite">
-            <div class="guide-summary-top">
-              <strong class="guide-status" id="guideStatus">기상정보 확인 중</strong>
-              <span class="source-tag" id="guideSource">기상 자동값</span>
-            </div>
-            <p id="guideSummary">값이 준비되면 현재 단계의 핵심 지침이 표시됩니다.</p>
-          </div>
-          <ol class="guide-list" id="keyList"></ol>
-          <div class="home-support" id="homeSupport"></div>
-        </div>
-      </section>
-
-      <div class="two-column">
-        <section class="card" aria-labelledby="forecast-title">
-          <div class="card-body">
-            <div class="section-heading">
-              <div>
-                <p class="section-kicker">근무시간 전망</p>
-                <h2 class="section-title" id="forecast-title">시간별 체감온도</h2>
-              </div>
-            </div>
-            <div class="forecast-controls">
-              <div class="segmented" aria-label="근무시간 선택">
-                <button class="segment-button" type="button" data-shift="day" aria-pressed="true">주간 09:00~18:40</button>
-                <button class="segment-button" type="button" data-shift="night" aria-pressed="false">야간 18:10~익일 09:00</button>
-              </div>
-            </div>
-            <div class="forecast-summary" id="forecastSummary" aria-live="polite">시간별 예보를 확인하고 있습니다.</div>
-            <div class="forecast-grid" id="forecast"></div>
-            <p class="microcopy" style="margin:12px 0 0">기상청 단기예보의 기온·습도에 여름철 체감온도 산식을 적용한 참고값입니다.</p>
-          </div>
-        </section>
-
-        <section class="card" aria-labelledby="calculator-title">
-          <div class="card-body">
-            <div class="section-heading">
-              <div>
-                <p class="section-kicker">현장값 우선 적용</p>
-                <h2 class="section-title" id="calculator-title">현장 체감온도 계산기</h2>
-                <p class="section-description">작업장 온·습도계가 기상값과 다를 때 사용합니다.</p>
-              </div>
-            </div>
-            <div class="calculator-grid">
-              <div class="field">
-                <label for="tempInput">현장 온도</label>
-                <div class="input-wrap"><input id="tempInput" inputmode="decimal" autocomplete="off" placeholder="예: 34.5" aria-describedby="fieldHelp"><span class="input-unit">℃</span></div>
-              </div>
-              <div class="field">
-                <label for="rhInput">상대습도</label>
-                <div class="input-wrap"><input id="rhInput" inputmode="decimal" autocomplete="off" placeholder="예: 70" aria-describedby="fieldHelp"><span class="input-unit">%</span></div>
-              </div>
-            </div>
-            <div class="calculate-result">
-              <div aria-live="polite">
-                <span class="result-label">계산된 현장 체감온도</span>
-                <strong class="result-value" id="fieldResult">값을 입력하세요</strong>
-              </div>
-              <button class="primary-button" id="useField" type="button" disabled>이 값으로 행동지침 적용</button>
-            </div>
-            <p class="microcopy" id="fieldHelp" style="margin:10px 0 0">자동값과 현장이 다르면 현장 측정값과 회사 폭염 대응계획을 우선 적용합니다.</p>
-          </div>
-        </section>
+    <section class="hero" aria-labelledby="current-status-title">
+      <div class="hero__topline">
+        <p class="hero__source"><span class="status-dot" id="heroDot" aria-hidden="true"></span><span id="heroLocation">순천역 인근 자동값</span></p>
+        <span class="hero__source-chip" id="heroSource">기상청 실황</span>
       </div>
 
-      <section class="card" aria-labelledby="health-title">
-        <div class="card-body">
-          <div class="section-heading">
+      <div class="hero__reading">
+        <div>
+          <p class="hero__eyebrow" id="current-status-title">현재 체감온도</p>
+          <div class="hero__temperature" id="currentTemp" aria-live="polite">--<span>℃</span></div>
+        </div>
+        <div class="hero__level" id="currentBadge" aria-live="polite">
+          <span class="hero__level-icon" aria-hidden="true">·</span>
+          <strong>확인 중</strong>
+        </div>
+      </div>
+
+      <div class="hero__action">
+        <p class="hero__action-label">현재 단계 핵심 행동</p>
+        <p id="currentAction">기상정보를 확인하고 있습니다.</p>
+      </div>
+
+      <div class="hero__meta" aria-label="현재 기상 상세정보">
+        <span id="heroTemp">기온 --℃</span>
+        <span id="heroHumidity">습도 --%</span>
+        <span id="heroObserved">관측시각 확인 중</span>
+      </div>
+      <p class="hero__updated" id="updated">최근 갱신정보 확인 중</p>
+      <span class="sr-only" id="headerStatus" aria-live="polite">기상 연동 중</span>
+    </section>
+
+    <p class="data-note" id="weatherMeta">기상청 초단기실황과 여름철 체감온도 산식을 적용한 참고값입니다. 실제 작업 판단은 현장 측정값과 회사 지침을 우선합니다.</p>
+
+    <section class="forecast-section surface" aria-labelledby="forecast-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">근무시간 예보</p>
+          <h2 id="forecast-title">남은 근무시간 전망</h2>
+        </div>
+      </div>
+
+      <div class="segmented segmented--soft" aria-label="근무시간 선택">
+        <button type="button" data-shift="day" aria-pressed="true"><strong>주간근무</strong><span>09:00~18:40</span></button>
+        <button type="button" data-shift="night" aria-pressed="false"><strong>야간근무</strong><span>18:10~익일 09:00</span></button>
+      </div>
+
+      <div class="forecast-highlight" id="forecastHighlight" aria-live="polite">
+        <div class="forecast-highlight__head">
+          <span>예상 최고 체감온도</span>
+          <div><strong id="forecastMax">--℃</strong><span class="forecast-level-badge" id="forecastLevel">확인 중</span></div>
+        </div>
+        <dl class="forecast-facts">
+          <div><dt>최고 예상</dt><dd id="forecastPeakTime">--</dd></div>
+          <div><dt>가장 더운 시간</dt><dd id="forecastHotWindow">--</dd></div>
+          <div><dt>단계 전망</dt><dd id="forecastTrend">--</dd></div>
+        </dl>
+        <p class="forecast-advice" id="forecastAdvice">시간별 예보를 확인하고 있습니다.</p>
+      </div>
+
+      <div class="hourly-block">
+        <div class="hourly-block__title">
+          <h3>시간별 전망</h3>
+          <span id="forecastSummary">기상청 단기예보 기준</span>
+        </div>
+        <div class="forecast-grid" id="forecast"></div>
+      </div>
+    </section>
+
+    <section class="action-section surface" aria-labelledby="action-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">현장 업무 지침</p>
+          <h2 id="action-title">지금 해야 할 행동</h2>
+          <p class="section-description">적용 기준과 직무를 선택하면 현재 단계 지침이 바로 표시됩니다.</p>
+        </div>
+      </div>
+
+      <div class="action-settings">
+        <div class="setting-group">
+          <span class="setting-label">적용 기준</span>
+          <div class="segmented" aria-label="행동지침 적용 기준">
+            <button type="button" data-source="auto" aria-pressed="true">기상 자동값</button>
+            <button type="button" data-source="field" aria-pressed="false">현장 입력값</button>
+          </div>
+        </div>
+        <div class="setting-group">
+          <span class="setting-label">담당 직무</span>
+          <div class="segmented" aria-label="담당 직무">
+            <button type="button" data-job="yard" aria-pressed="true">수송</button>
+            <button type="button" data-job="platform" aria-pressed="false">홈안내</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-panel" id="fieldPanel" hidden>
+        <div class="field-panel__heading">
+          <div>
+            <h3>현장 체감온도 계산</h3>
+            <p>작업장 온·습도계가 자동값과 다를 때 입력</p>
+          </div>
+        </div>
+        <div class="calculator-grid">
+          <label class="field">현장 온도
+            <span class="input-wrap"><input id="tempInput" inputmode="decimal" autocomplete="off" placeholder="예: 34.5" aria-describedby="fieldHelp"><span>℃</span></span>
+          </label>
+          <label class="field">상대습도
+            <span class="input-wrap"><input id="rhInput" inputmode="decimal" autocomplete="off" placeholder="예: 70" aria-describedby="fieldHelp"><span>%</span></span>
+          </label>
+        </div>
+        <div class="field-result-row">
+          <div><span>계산 결과</span><strong id="fieldResult" aria-live="polite">값을 입력하세요</strong></div>
+          <button class="primary-button" id="useField" type="button" disabled>이 값 적용</button>
+        </div>
+        <p class="microcopy" id="fieldHelp">현장 측정값과 회사 폭염 대응계획을 우선 적용합니다.</p>
+      </div>
+
+      <div class="guide-header" aria-live="polite">
+        <div>
+          <span class="guide-context" id="guideContext">수송 · 기상 자동값</span>
+          <strong id="guideStatus">기상정보 확인 중</strong>
+        </div>
+        <span class="guide-level-dot" id="guideLevelDot" aria-hidden="true"></span>
+      </div>
+      <p class="guide-summary" id="guideSummary">값이 준비되면 현재 단계의 핵심 지침이 표시됩니다.</p>
+      <ol class="guide-list" id="keyList"></ol>
+      <div id="homeSupport"></div>
+    </section>
+
+    <section class="safety-section surface" aria-labelledby="health-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">공통 안전정보</p>
+          <h2 id="health-title">건강상태·이상징후·응급조치</h2>
+          <p class="section-description">직무별 지침과 별도로 본인과 동료의 상태를 확인합니다.</p>
+        </div>
+      </div>
+
+      <div class="emergency-banner">
+        <strong>의식·말투·걸음 이상</strong>
+        <span>즉시 119 신고 · 신속한 냉각 · 음료 제공 금지</span>
+      </div>
+
+      <div class="info-list">
+        <details class="info-block">
+          <summary>오늘 컨디션 확인</summary>
+          <div class="details-content">
+            <p class="check-intro">오늘 해당하는 항목 선택 · 선택 결과 저장 안 됨</p>
+            <label class="condition-row"><input class="condition-check" type="checkbox" value="sleep">수면이 매우 부족함</label>
+            <label class="condition-row"><input class="condition-check" type="checkbox" value="illness">발열·설사·구토</label>
+            <label class="condition-row"><input class="condition-check" type="checkbox" value="heat">두통·어지럼·메스꺼움</label>
+            <label class="condition-row"><input class="condition-check" type="checkbox" value="fatigue">평소와 다른 과도한 피로</label>
+            <div class="condition-result" id="conditionResult" aria-live="polite"><strong>선택한 증상 없음</strong><p>근무 중 상태 변화 시 다시 확인</p></div>
+            <p class="microcopy">의학적 진단을 대신하지 않습니다. 증상이 지속되거나 악화되면 의료기관의 도움을 받으세요.</p>
+          </div>
+        </details>
+
+        <details class="info-block">
+          <summary>수분 섭취·냉방휴식</summary>
+          <div class="details-content">
+            <ul>
+              <li>갈증 전 시원한 물을 조금씩 자주 섭취</li>
+              <li>장시간 많은 땀 발생 시 물과 함께 이온음료·식사로 전해질 보충</li>
+              <li>작업 사이 그늘 또는 냉방장소에서 체온 낮추기</li>
+              <li>의식·말투·행동 이상자에게 물·음료·캔디 제공 금지</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="info-block">
+          <summary>동료의 이상징후 확인</summary>
+          <div class="details-content detail-columns">
             <div>
-              <p class="section-kicker">공통 안전정보</p>
-              <h2 class="section-title" id="health-title">건강상태·이상징후·응급조치</h2>
-              <p class="section-description">직무별 지침과 별도로 본인과 동료의 상태를 확인합니다.</p>
+              <p class="subhead">작업 중지 및 상태 확인 필요</p>
+              <ul>
+                <li>두통·어지럼·메스꺼움 호소</li>
+                <li>심한 피로 또는 기력 저하</li>
+                <li>비틀거림 또는 평소보다 서툰 작업 동작</li>
+                <li>짜증·멍함·반응 저하 등 평소와 다른 모습</li>
+                <li>근육경련 또는 과도한 발한</li>
+              </ul>
+            </div>
+            <div>
+              <p class="subhead subhead--danger">즉시 119 신고 필요</p>
+              <ul>
+                <li>어눌한 말투 또는 횡설수설</li>
+                <li>질문에 대한 부적절한 반응</li>
+                <li>걷기 또는 서 있기 어려움</li>
+                <li>의식저하·실신·경련</li>
+              </ul>
             </div>
           </div>
-          <div class="emergency-strip">의식·말투·걸음 이상 → 즉시 119 신고 · 신속한 냉각 · 음료 제공 금지</div>
-          <div class="info-list">
-            <details class="info-block">
-              <summary>오늘 컨디션 확인</summary>
-              <div class="details-content">
-                <p class="check-intro">오늘 해당하는 항목 선택 · 선택 결과 저장 안 됨</p>
-                <label class="condition-row"><input class="condition-check" type="checkbox" value="sleep">수면이 매우 부족함</label>
-                <label class="condition-row"><input class="condition-check" type="checkbox" value="illness">발열·설사·구토</label>
-                <label class="condition-row"><input class="condition-check" type="checkbox" value="heat">두통·어지럼·메스꺼움</label>
-                <label class="condition-row"><input class="condition-check" type="checkbox" value="fatigue">평소와 다른 과도한 피로</label>
-                <div class="condition-result" id="conditionResult" aria-live="polite">
-                  <strong>선택한 증상 없음</strong>
-                  <p>근무 중 상태 변화 시 다시 확인</p>
-                </div>
-                <p class="microcopy" style="margin:10px 0 0">의학적 진단을 대신하지 않습니다. 증상이 지속되거나 악화되면 의료기관의 도움을 받으세요.</p>
-              </div>
-            </details>
-<details class="info-block">
-              <summary>동료의 이상징후 확인</summary>
-              <div class="details-content">
-                <p class="subhead">작업 중지 및 상태 확인 필요</p>
-                <ul>
-                  <li>두통·어지럼·메스꺼움 호소</li>
-                  <li>심한 피로 또는 기력 저하</li>
-                  <li>비틀거림 또는 평소보다 서툰 작업 동작</li>
-                  <li>짜증·멍함·반응 저하 등 평소와 다른 모습</li>
-                  <li>근육경련 또는 과도한 발한</li>
-                </ul>
-                <p class="subhead">즉시 119 신고 필요</p>
-                <ul>
-                  <li>어눌한 말투 또는 횡설수설</li>
-                  <li>질문에 대한 부적절한 반응</li>
-                  <li>걷기 또는 서 있기 어려움</li>
-                  <li>의식저하·실신·경련</li>
-                </ul>
-              </div>
-            </details>
+        </details>
 
-            <details class="info-block">
-              <summary>온열질환 응급조치</summary>
-              <div class="details-content">
-                <p class="subhead">의식이 있고 대화가 가능한 경우</p>
-                <ol>
-                  <li>즉시 작업 중지</li>
-                  <li>냉방장소 또는 그늘로 이동</li>
-                  <li>안전모·불필요한 겉옷 제거 또는 느슨하게 조정</li>
-                  <li>냉각팩·젖은 수건으로 신속한 냉각</li>
-                  <li>스스로 삼킬 수 있는 경우에만 시원한 물 소량 제공</li>
-                  <li>빠른 회복이 없으면 119 신고</li>
-                </ol>
-                <p class="subhead">의식·말투·행동에 이상이 있는 경우</p>
-                <ol>
-                  <li>즉시 119 신고</li>
-                  <li>냉방장소 또는 그늘로 이동</li>
-                  <li>옷을 느슨하게 하고 적극적인 냉각</li>
-                  <li>구급대 도착 전까지 혼자 두지 않기</li>
-                  <li>물·이온음료·캔디 제공 금지</li>
-                </ol>
-                <a class="call-button" href="tel:119">119 전화하기</a>
-              </div>
-            </details>
+        <details class="info-block">
+          <summary>온열질환 응급조치</summary>
+          <div class="details-content detail-columns">
+            <div>
+              <p class="subhead">의식이 있고 대화가 가능한 경우</p>
+              <ol>
+                <li>즉시 작업 중지</li>
+                <li>냉방장소 또는 그늘로 이동</li>
+                <li>안전모·불필요한 겉옷 제거 또는 느슨하게 조정</li>
+                <li>냉각팩·젖은 수건으로 신속한 냉각</li>
+                <li>스스로 삼킬 수 있는 경우에만 시원한 물 소량 제공</li>
+                <li>빠른 회복이 없으면 119 신고</li>
+              </ol>
+            </div>
+            <div>
+              <p class="subhead subhead--danger">의식·말투·행동에 이상이 있는 경우</p>
+              <ol>
+                <li>즉시 119 신고</li>
+                <li>냉방장소 또는 그늘로 이동</li>
+                <li>옷을 느슨하게 하고 적극적인 냉각</li>
+                <li>구급대 도착 전까지 혼자 두지 않기</li>
+                <li>물·이온음료·캔디 제공 금지</li>
+              </ol>
+              <a class="call-button" href="tel:119">119 전화하기</a>
+            </div>
           </div>
+        </details>
+      </div>
+    </section>
+
+    <div class="utility-grid">
+      <section class="utility-section surface" aria-labelledby="contacts-title">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">순천관리역 비상연락망</p>
+            <h2 id="contacts-title">원터치 연락</h2>
+          </div>
+        </div>
+        <div class="contact-list">
+          <a class="contact-link contact-link--emergency" href="tel:119"><strong>응급환자</strong><span>119 전화</span></a>
+          <a class="contact-link" href="tel:0617492288"><strong>순천역 역무실</strong><span>061-749-2288</span></a>
+          <a class="contact-link" href="tel:0617443913"><strong>순천역 운전실</strong><span>061-744-3913</span></a>
+          <a class="contact-link" href="tel:0617443174"><strong>순천역 수송실</strong><span>061-744-3174</span></a>
         </div>
       </section>
 
-      <section class="card" aria-labelledby="contacts-title">
-        <div class="card-body">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">순천관리역 비상연락망</p>
-              <h2 class="section-title" id="contacts-title">원터치 연락</h2>
-            </div>
-          </div>
-          <div class="contacts-grid">
-            <a class="contact-link emergency" href="tel:119"><strong>응급환자</strong><span>119 전화</span></a>
-            <a class="contact-link" href="tel:0617492288"><strong>순천역 역무실</strong><span>061-749-2288</span></a>
-            <a class="contact-link" href="tel:0617443913"><strong>순천역 운전실</strong><span>061-744-3913</span></a>
-            <a class="contact-link" href="tel:0617443174"><strong>순천역 수송실</strong><span>061-744-3174</span></a>
+      <section class="utility-section surface" aria-labelledby="standards-title">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">2026 공식 기준</p>
+            <h2 id="standards-title">단계별 기준</h2>
           </div>
         </div>
-      </section>
-
-      <section class="card" aria-labelledby="standards-title">
-        <div class="card-body">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">2026 공식 기준</p>
-              <h2 class="section-title" id="standards-title">단계별 기준</h2>
-            </div>
-          </div>
-          <div class="standards-grid">
-            <div class="standard-item" style="--standard-color:#9a6500;--standard-dark:#6f4900;--standard-soft:#fff7df;--standard-line:#dfc786">
-              <div class="standard-degree">31℃</div><div class="standard-copy">장시간 작업 시 폭염작업</div>
-            </div>
-            <div class="standard-item" style="--standard-color:#c45600;--standard-dark:#8f3e00;--standard-soft:#fff1e5;--standard-line:#e1b28d">
-              <div class="standard-degree">33℃</div><div class="standard-copy">폭염작업 시 2시간 이내 20분 휴식<small>법적 기준</small></div>
-            </div>
-            <div class="standard-item" style="--standard-color:#c72c2c;--standard-dark:#8f1e1e;--standard-soft:#fff0f0;--standard-line:#e3a6a6">
-              <div class="standard-degree">35℃</div><div class="standard-copy">14~17시 일반 옥외작업 중지 권고<small>정부 권고</small></div>
-            </div>
-            <div class="standard-item" style="--standard-color:#7f1d1d;--standard-dark:#571313;--standard-soft:#fcecec;--standard-line:#d99b9b">
-              <div class="standard-degree">38℃</div><div class="standard-copy">긴급조치 외 옥외작업 중지 강력 권고<small>정부 권고</small></div>
-            </div>
-          </div>
-          <p class="notice">35℃·38℃의 작업중지는 일률적인 법정 금지가 아닌 정부 권고입니다. 불가피한 필수업무는 회사 지침과 관리자 판단에 따라 휴식·교대·보냉조치를 강화합니다.</p>
+        <div class="standards-list">
+          <div class="standard-row standard-row--caution"><strong>31℃</strong><span>장시간 작업 시 폭염작업</span></div>
+          <div class="standard-row standard-row--warning"><strong>33℃</strong><span>폭염작업 시 2시간 이내 20분 휴식 <small>법적 기준</small></span></div>
+          <div class="standard-row standard-row--danger"><strong>35℃</strong><span>14~17시 일반 옥외작업 중지 권고 <small>정부 권고</small></span></div>
+          <div class="standard-row standard-row--extreme"><strong>38℃</strong><span>긴급조치 외 옥외작업 중지 강력 권고 <small>정부 권고</small></span></div>
         </div>
+        <p class="standards-note">35℃·38℃의 작업중지는 일률적인 법정 금지가 아닌 정부 권고입니다. 불가피한 필수업무는 회사 지침과 관리자 판단에 따라 휴식·교대·보냉조치를 강화합니다.</p>
       </section>
     </div>
 
