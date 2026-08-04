@@ -1,0 +1,53 @@
+name: Fix heat index formula
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-heat-index.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update index.html
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          old_heading = '<section class="card"><div class="section-label">현장 측정값</div><h2>온도·습도를 직접 입력하세요</h2>'
+          new_heading = '<section class="card"><h2>현장측정값을 입력하세요</h2>'
+          if old_heading in text:
+              text = text.replace(old_heading, new_heading)
+
+          old_formula = "function heatIndex(t,rh){if(!Number.isFinite(t)||!Number.isFinite(rh))return null;const f=t*9/5+32;let hi=.5*(f+61+((f-68)*1.2)+(rh*.094));if((hi+f)/2>=80){hi=-42.379+2.04901523*f+10.14333127*rh-.22475541*f*rh-.00683783*f*f-.05481717*rh*rh+.00122874*f*f*rh+.00085282*f*rh*rh-.00000199*f*f*rh*rh;if(rh<13&&f>=80&&f<=112)hi-=((13-rh)/4)*Math.sqrt((17-Math.abs(f-95))/17);if(rh>85&&f>=80&&f<=87)hi+=((rh-85)/10)*((87-f)/5)}return Math.round(((hi-32)*5/9)*10)/10}"
+          new_formula = "function heatIndex(t,rh){if(!Number.isFinite(t)||!Number.isFinite(rh)||rh<0||rh>100)return null;const tw=t*Math.atan(0.151977*Math.sqrt(rh+8.313659))+Math.atan(t+rh)-Math.atan(rh-1.67633)+0.00391838*Math.pow(rh,1.5)*Math.atan(0.023101*rh)-4.686035;const apparent=-0.2442+0.55399*tw+0.45535*t-0.0022*tw*tw+0.00278*tw*t+3.0;return Math.round(apparent*10)/10}"
+
+          if old_formula not in text:
+              raise SystemExit('기존 Heat Index 계산식을 찾지 못했습니다.')
+
+          text = text.replace(old_formula, new_formula)
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Verify 35C 70 percent
+        run: |
+          node - <<'JS'
+          function heatIndex(t,rh){if(!Number.isFinite(t)||!Number.isFinite(rh)||rh<0||rh>100)return null;const tw=t*Math.atan(0.151977*Math.sqrt(rh+8.313659))+Math.atan(t+rh)-Math.atan(rh-1.67633)+0.00391838*Math.pow(rh,1.5)*Math.atan(0.023101*rh)-4.686035;const apparent=-0.2442+0.55399*tw+0.45535*t-0.0022*tw*tw+0.00278*tw*t+3.0;return Math.round(apparent*10)/10}
+          const result = heatIndex(35,70)
+          if (result !== 36.4) throw new Error(`expected 36.4, got ${result}`)
+          console.log(result)
+          JS
+      - name: Commit change
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "기상청 기준 체감온도 계산식으로 수정"
+          git push
