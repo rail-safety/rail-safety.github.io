@@ -12,7 +12,6 @@ index = index_path.read_text(encoding="utf-8")
 app = app_path.read_text(encoding="utf-8")
 styles = styles_path.read_text(encoding="utf-8")
 
-# 근무역 버튼은 모바일 한 줄에 들어가는 짧은 명칭과 업무 순서로 유지한다.
 station_buttons = '''<div class="station-grid" id="stationButtons" aria-label="근무역 선택">
         <button type="button" data-station="suncheon" aria-pressed="true">순천</button>
         <button type="button" data-station="gokseong" aria-pressed="false">곡성</button>
@@ -30,14 +29,10 @@ index, station_count = re.subn(
 if station_count != 1:
     raise SystemExit("index.html의 근무역 버튼 영역을 찾지 못했습니다.")
 
-# 시간별 예보는 정시 단위이므로 야간 표시는 18:00~익일 08:00으로 맞춘다.
 index = index.replace("18:10~익일 09:00", "18:00~익일 08:00")
+index = re.sub(r'href="styles\.css(?:\?v=[^"]+)?"', 'href="styles.css?v=20260805-0815"', index, count=1)
+index = re.sub(r'src="app\.js(?:\?v=[^"]+)?"', 'src="app.js?v=20260805-0815"', index, count=1)
 
-# 새 자바스크립트와 스타일을 브라우저 캐시가 아닌 최신 파일로 강제 로드한다.
-index = re.sub(r'href="styles\.css(?:\?v=[^"]+)?"', 'href="styles.css?v=20260805-0750"', index, count=1)
-index = re.sub(r'src="app\.js(?:\?v=[^"]+)?"', 'src="app.js?v=20260805-0750"', index, count=1)
-
-# 주간은 09~18시, 야간은 당일 18시부터 익일 08시까지 하나의 연속 구간으로 표시한다.
 shift_functions = '''function getShiftWindow(now = new Date()) {
   const start = new Date(now);
   const end = new Date(now);
@@ -89,13 +84,105 @@ if shift_count != 1:
 app = app.replace('  const firstDate = new Date(rows[0].time);\n', '')
 app = app.replace('const timeLabel = formatForecastHour(date, firstDate);', 'const timeLabel = formatForecastHour(date);')
 
+compact_css = '''/* compact-density-patch:start */
+.hero__action {
+  margin-top: 20px;
+  padding-top: 16px;
+}
+.hero__action-label {
+  margin-bottom: 2px;
+  font-size: 13px;
+}
+.hero__action p:last-child {
+  font-size: clamp(17px, 4.7vw, 19px);
+  line-height: 1.42;
+  font-weight: 620;
+}
+.hero__meta {
+  margin-top: 14px;
+}
+.forecast-advice,
+.emergency-banner,
+.condition-result {
+  border-left: 0;
+}
+.forecast-advice {
+  padding: 12px 13px;
+  background: rgb(255 255 255 / 72%);
+}
+.emergency-banner,
+.condition-result {
+  background: #f5f7f8;
+}
+.hourly-block {
+  margin-top: 18px;
+}
+.hourly-block__title {
+  margin-bottom: 6px;
+}
+.forecast-grid {
+  border-top: 1px solid var(--line);
+}
+.forecast-item {
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  gap: 8px;
+  min-height: 38px;
+  padding: 3px 2px;
+}
+.forecast-time {
+  font-size: 14px;
+  font-weight: 620;
+}
+.forecast-track {
+  gap: 7px;
+}
+.forecast-level {
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 650;
+}
+.forecast-level::before {
+  width: 7px;
+  height: 7px;
+}
+.forecast-temp {
+  min-width: 60px;
+  padding: 4px 8px;
+  font-size: 15px;
+  font-weight: 700;
+}
+@media (max-width: 380px) {
+  .forecast-item {
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    gap: 6px;
+    min-height: 36px;
+  }
+  .forecast-time { font-size: 13px; }
+  .forecast-level { font-size: 11px; }
+  .forecast-temp {
+    min-width: 56px;
+    padding-inline: 7px;
+    font-size: 14px;
+  }
+}
+/* compact-density-patch:end */'''
+styles = re.sub(
+    r'/\* compact-density-patch:start \*/.*?/\* compact-density-patch:end \*/',
+    compact_css,
+    styles,
+    count=1,
+    flags=re.S,
+)
+if "/* compact-density-patch:start */" not in styles:
+    styles = styles.rstrip() + "\n\n" + compact_css + "\n"
+
 required_markers = {
     "index.html": (
         'data-station="suncheon"',
         'data-station="gurye"',
         '18:00~익일 08:00',
-        'styles.css?v=20260805-0750',
-        'app.js?v=20260805-0750',
+        'styles.css?v=20260805-0815',
+        'app.js?v=20260805-0815',
         'id="forecast"',
     ),
     "app.js": (
@@ -106,6 +193,7 @@ required_markers = {
     ),
     "styles.css": (
         "/* hourly-list-patch:start */",
+        "/* compact-density-patch:start */",
         ".forecast-track",
         "repeat(5",
     ),
@@ -120,4 +208,4 @@ for filename, markers in required_markers.items():
 index_path.write_text(index, encoding="utf-8")
 app_path.write_text(app, encoding="utf-8")
 styles_path.write_text(styles, encoding="utf-8")
-print("야간근무 예보와 정적 파일 캐시 무효화를 반영했습니다.")
+print("히어로 행동문구와 시간별 전망 밀도를 개선했습니다.")
