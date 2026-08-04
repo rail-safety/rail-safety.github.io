@@ -234,20 +234,60 @@ async function loadWeather() {
   }
 }
 
-function isInShift(date) {
-  const hour = date.getHours() + date.getMinutes() / 60;
-  if (state.shift === "day") return hour >= 9 && hour <= 18.67;
-  return hour >= 18.17 || hour <= 9;
+function getShiftWindow(now = new Date()) {
+  const start = new Date(now);
+  const end = new Date(now);
+
+  if (state.shift === "day") {
+    start.setHours(9, 0, 0, 0);
+    end.setHours(18, 40, 0, 0);
+    if (now > end) {
+      start.setDate(start.getDate() + 1);
+      end.setDate(end.getDate() + 1);
+    }
+  } else {
+    const minutes = now.getHours() * 60 + now.getMinutes();
+    const nightEnd = 9 * 60;
+    const nightStart = 18 * 60 + 10;
+
+    if (minutes <= nightEnd) {
+      start.setDate(start.getDate() - 1);
+      start.setHours(18, 10, 0, 0);
+      end.setHours(9, 0, 0, 0);
+    } else {
+      start.setHours(18, 10, 0, 0);
+      end.setDate(end.getDate() + 1);
+      end.setHours(9, 0, 0, 0);
+      if (minutes > nightStart) {
+        start.setHours(18, 10, 0, 0);
+      }
+    }
+  }
+
+  return { start, end };
 }
 
 function getForecastRows() {
   const now = new Date();
+  const { start, end } = getShiftWindow(now);
+  const lowerBound = now >= start && now <= end
+    ? new Date(now.getTime() - 60 * 60 * 1000)
+    : start;
+
   return state.hourly
     .filter((item) => {
       const date = new Date(item.time);
-      return date >= new Date(now.getTime() - 3600000) && isInShift(date);
+      return date >= lowerBound && date <= end;
     })
-    .slice(0, 12);
+    .sort((a, b) => new Date(a.time) - new Date(b.time));
+}
+
+function formatForecastHour(date, firstDate) {
+  const isNextDay = firstDate && date.toDateString() !== firstDate.toDateString();
+  const hour = date.getHours();
+  const period = hour < 12 ? "오전" : "오후";
+  const displayHour = hour % 12 || 12;
+  return `${isNextDay ? "익일 " : ""}${period} ${displayHour}시`;
 }
 
 function getHotWindow(rows, highest) {
@@ -295,14 +335,16 @@ function renderForecast() {
   $("#forecastSummary").textContent = `${rows.length}개 시간대 · 기상청 단기예보`;
 
   const now = new Date();
+  const firstDate = new Date(rows[0].time);
   forecast.innerHTML = rows.map((item) => {
     const date = new Date(item.time);
     const level = getLevel(item.hi);
     const current = date.getHours() === now.getHours() && date.toDateString() === now.toDateString();
-    return `<article class="forecast-item" data-current="${current}" style="--item-risk:${level.color};--item-risk-dark:${level.dark}" aria-label="${date.getHours()}시, 체감온도 ${item.hi.toFixed(1)}도, ${level.name}">
-      <div class="forecast-time">${date.getHours()}시</div>
+    const timeLabel = formatForecastHour(date, firstDate);
+    return `<article class="forecast-item" data-current="${current}" style="--item-risk:${level.color};--item-risk-dark:${level.dark};--item-risk-soft:${level.soft}" aria-label="${timeLabel}, 체감온도 ${item.hi.toFixed(1)}도, ${level.name}">
+      <time class="forecast-time" datetime="${item.time}">${timeLabel}</time>
+      <div class="forecast-track"><span class="forecast-level">${level.name}</span></div>
       <div class="forecast-temp">${item.hi.toFixed(1)}℃</div>
-      <div class="forecast-level">${level.name}</div>
     </article>`;
   }).join("");
 }

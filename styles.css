@@ -371,3 +371,89 @@ footer a { color: var(--brand-800); font-weight: 620; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
 }
+
+/* hourly-list-patch:start */
+.station-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+.station-grid button {
+  min-height: 46px;
+  padding-inline: 2px;
+  font-size: clamp(14px, 4vw, 16px);
+  white-space: nowrap;
+}
+.forecast-grid {
+  display: block;
+  border-top: 1px solid var(--line);
+}
+.forecast-item {
+  display: grid;
+  grid-template-columns: minmax(82px, 104px) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 58px;
+  padding: 9px 2px;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  text-align: left;
+}
+.forecast-item[data-current="true"] {
+  background: var(--brand-050);
+  box-shadow: none;
+}
+.forecast-time {
+  color: var(--text-strong);
+  font-size: 16px;
+  font-weight: 620;
+  white-space: nowrap;
+}
+.forecast-track {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.forecast-track::after {
+  content: "";
+  flex: 1 1 auto;
+  min-width: 12px;
+  height: 1px;
+  background: var(--line);
+}
+.forecast-level {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--item-risk-dark);
+  font-size: 14px;
+  font-weight: 680;
+  white-space: nowrap;
+}
+.forecast-level::before {
+  width: 9px;
+  height: 9px;
+  background: var(--item-risk);
+}
+.forecast-temp {
+  min-width: 72px;
+  margin: 0;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: var(--item-risk-soft);
+  color: var(--item-risk-dark);
+  font-size: 18px;
+  font-weight: 720;
+  text-align: center;
+}
+@media (max-width: 380px) {
+  .station-section { padding-inline: 14px; }
+  .station-grid { gap: 4px; }
+  .station-grid button { font-size: 14px; }
+  .forecast-item { grid-template-columns: 78px minmax(0, 1fr) auto; gap: 8px; }
+  .forecast-level { font-size: 13px; }
+  .forecast-temp { min-width: 66px; padding-inline: 8px; font-size: 17px; }
+}
+/* hourly-list-patch:end */
