@@ -21,8 +21,8 @@
 <body>
 <header class="top"><div class="wrap"><div class="eyebrow">KORAIL · 순천관리역</div><h1>폭염 안전가이드</h1><div class="topline"><a class="link" href="https://www.weather.go.kr" target="_blank" rel="noopener">기상청 날씨 ↗</a><span class="updated" id="updated">기상정보 불러오는 중</span></div></div></header>
 <main class="wrap">
-  <section class="card"><h2>근무역 선택</h2><div class="station-grid" id="stations"></div><div class="weather-box"><div><div class="weather-title" id="weatherTitle">현재 체감온도</div><div class="big-temp" id="currentTemp">--℃</div><div class="weather-meta" id="weatherMeta">현재 기상정보를 확인하고 있습니다.</div></div><div><span class="badge" id="currentBadge">확인 중</span><p class="hint" id="weatherNote">자동 기상값은 참고용입니다. 실제 작업 판단은 현장 측정값을 우선하세요.</p></div></div></section>
-  <section class="card"><h2>오늘의 체감온도</h2><div class="shift-row"><button class="choice active" data-shift="day">주간근무 09:00~18:40</button><button class="choice" data-shift="night">야간근무 18:10~익일 09:00</button></div><div class="forecast" id="forecast"><div class="hint">시간별 예보를 계산하고 있습니다.</div></div><p class="hint">시간별 예보 기온·습도에 기상청 여름철 체감온도 산식을 적용한 참고값입니다. 실제 판단은 현장 측정값과 회사 지침을 우선하세요.</p></section>
+  <section class="card"><h2>근무역 선택</h2><div class="station-grid" id="stations"></div><div class="weather-box"><div><div class="weather-title" id="weatherTitle">현재 체감온도(기상청 예보 기준)</div><div class="big-temp" id="currentTemp">--℃</div><div class="weather-meta" id="weatherMeta">현재 기상정보를 확인하고 있습니다.</div></div><div><span class="badge" id="currentBadge">확인 중</span><p class="hint" id="weatherNote">자동 기상값은 참고용입니다. 실제 작업 판단은 현장 측정값을 우선하세요.</p></div></div></section>
+  <section class="card"><h2>오늘의 체감온도</h2><div class="shift-row"><button class="choice active" data-shift="day">주간근무 09:00~18:40</button><button class="choice" data-shift="night">야간근무 18:10~익일 09:00</button></div><div class="forecast" id="forecast"><div class="hint">시간별 예보를 계산하고 있습니다.</div></div><p class="hint">기상청 단기예보의 시간별 기온·습도에 기상청 여름철 체감온도 산식을 적용한 값입니다. 실제 판단은 현장 측정값과 회사 지침을 우선하세요.</p></section>
   <section class="card"><h2>현장측정값을 입력하세요</h2><div class="inputs"><div class="field"><label for="tempInput">온도</label><div class="input-wrap"><input id="tempInput" inputmode="decimal" placeholder="예: 34.5"><b>℃</b></div></div><div class="field"><label for="rhInput">상대습도</label><div class="input-wrap"><input id="rhInput" inputmode="decimal" placeholder="예: 70"><b>%</b></div></div></div><div class="measure-result"><div><span class="hint">현장 체감온도</span><br><strong id="fieldResult">값을 입력하세요</strong></div><button class="primary" id="useField" disabled>이 측정값으로 행동지침 보기</button></div><p class="hint">자동값과 현장이 다르면 작업장소에 설치한 온·습도계 수치를 적용하세요.</p></section>
   <section class="card"><div class="section-label">직무별 행동지침</div><h2>지금 이렇게 하세요</h2><div class="source-row"><button class="choice active" data-source="auto">✓ 기상 자동값</button><button class="choice" data-source="field">현장 입력값</button></div><div class="job-row" style="margin-top:9px"><button class="choice active" data-job="yard">↔ 수송·입환</button><button class="choice" data-job="platform">● 홈안내</button></div><div class="status-banner"><strong id="guideStatus">기상정보 확인 중</strong><div id="guideSummary">현재 단계에 맞는 행동지침을 준비하고 있습니다.</div></div><div class="key-list" id="keyList"></div><div id="details"></div><div class="quick-grid"><button class="quick" onclick="alert('물 충분히 마시기 · 전날 과음 피하기 · 열·설사·어지럼이 있으면 관리자에게 알리기')">✓ 근무 전 30초 확인</button><button class="quick" onclick="alert('즉시 작업을 멈추고 그늘이나 냉방장소로 이동시킨 뒤 관리자와 119에 연락하세요.')">! 동료가 이상해요</button><button class="quick" onclick="alert('의식이 없거나 회복되지 않으면 119 신고, 몸을 식히고 음료는 억지로 먹이지 마세요.')">온열질환 응급조치</button></div></section>
   <section class="card"><div class="section-label">순천관리역 비상연락망</div><h2>한 번 눌러 바로 전화</h2><div class="contacts"><a class="contact" href="tel:119"><strong>응급환자</strong><span>119 전화하기</span></a><a class="contact" href="tel:0617492288"><strong>순천역 역무실</strong><span>061-749-2288</span></a><a class="contact" href="tel:0617443913"><strong>순천역 운전실</strong><span>061-744-3913</span></a><a class="contact" href="tel:0617443174"><strong>순천역 수송실</strong><span>061-744-3174</span></a></div></section>
@@ -38,7 +38,43 @@ function heatIndex(t,rh){if(!Number.isFinite(t)||!Number.isFinite(rh)||rh<0||rh>
 function getLevel(v){return levels.find(x=>v>=x.min)}
 function setLevelColor(level){document.documentElement.style.setProperty('--level',level.color)}
 function renderStations(){stations.innerHTML=Object.entries(stationData).map(([k,s])=>`<button class="station ${k===state.station?'active':''}" data-station="${k}">${s.name}</button>`).join('');document.querySelectorAll('[data-station]').forEach(b=>b.onclick=()=>{state.station=b.dataset.station;renderStations();loadWeather()})}
-async function loadWeather(){const s=stationData[state.station];weatherTitle.textContent='현재 체감온도';currentTemp.textContent='--℃';weatherMeta.textContent='현재 기상정보를 확인하고 있습니다.';try{const url=`https://api.open-meteo.com/v1/forecast?latitude=${s.lat}&longitude=${s.lon}&current=temperature_2m,relative_humidity_2m&hourly=temperature_2m,relative_humidity_2m&timezone=Asia%2FSeoul&forecast_days=2`;const res=await fetch(url);if(!res.ok)throw new Error();const data=await res.json();const t=data.current.temperature_2m,rh=data.current.relative_humidity_2m,hi=heatIndex(t,rh);state.autoValue=hi;state.hourly=data.hourly.time.map((time,i)=>({time,temp:data.hourly.temperature_2m[i],rh:data.hourly.relative_humidity_2m[i],hi:heatIndex(data.hourly.temperature_2m[i],data.hourly.relative_humidity_2m[i])}));const lv=getLevel(hi);currentTemp.textContent=`${hi.toFixed(1)}℃`;weatherMeta.textContent=`기온 ${t.toFixed(1)}℃ · 습도 ${Math.round(rh)}% · 예보값에 기상청 산식 적용`;currentBadge.textContent=lv.name;currentBadge.style.background=lv.color;updated.textContent=`${new Date().toLocaleString('ko-KR')} 갱신`;renderForecast();renderGuide()}catch(e){currentTemp.textContent='확인 실패';weatherMeta.textContent='네트워크 상태를 확인하거나 현장값을 직접 입력하세요.';currentBadge.textContent='현장값 우선';currentBadge.style.background='#697887';forecast.innerHTML='<div class="hint">시간별 기상정보를 불러오지 못했습니다.</div>'}}
+async function loadWeather(){
+  const s=stationData[state.station];
+  weatherTitle.textContent='현재 체감온도(기상청 예보 기준)';
+  currentTemp.textContent='--℃';
+  weatherMeta.textContent='기상청 단기예보를 확인하고 있습니다.';
+  try{
+    const res=await fetch(`weather.json?v=${Date.now()}`,{cache:'no-store'});
+    if(!res.ok)throw new Error(`weather.json ${res.status}`);
+    const data=await res.json();
+    const station=data.stations?.[state.station];
+    if(!station||!Array.isArray(station.hourly)||!station.hourly.length)throw new Error('역별 예보 없음');
+    const row=station.current||station.hourly[0];
+    const t=Number(row.temp),rh=Number(row.rh),hi=Number(row.hi);
+    if(!Number.isFinite(t)||!Number.isFinite(rh)||!Number.isFinite(hi))throw new Error('잘못된 예보값');
+    state.autoValue=hi;
+    state.hourly=station.hourly.map(x=>({time:x.time,temp:Number(x.temp),rh:Number(x.rh),hi:Number(x.hi)}));
+    const lv=getLevel(hi);
+    currentTemp.textContent=`${hi.toFixed(1)}℃`;
+    weatherMeta.textContent=`기온 ${t.toFixed(1)}℃ · 습도 ${Math.round(rh)}% · 기상청 ${data.baseTime?.slice(0,2)||'--'}시 발표`;
+    currentBadge.textContent=lv.name;
+    currentBadge.style.background=lv.color;
+    const generated=data.generatedAt?new Date(data.generatedAt):new Date();
+    updated.textContent=`${generated.toLocaleString('ko-KR')} 갱신`;
+    renderForecast();
+    renderGuide();
+  }catch(e){
+    console.error(e);
+    state.autoValue=null;
+    state.hourly=[];
+    currentTemp.textContent='확인 실패';
+    weatherMeta.textContent='기상청 예보 파일을 불러오지 못했습니다. 현장값을 직접 입력하세요.';
+    currentBadge.textContent='현장값 우선';
+    currentBadge.style.background='#697887';
+    forecast.innerHTML='<div class="hint">기상청 시간별 예보를 불러오지 못했습니다.</div>';
+    renderGuide();
+  }
+}
 function isInShift(d){const h=d.getHours()+d.getMinutes()/60;if(state.shift==='day')return h>=9&&h<=18.67;return h>=18.17||h<=9}
 function renderForecast(){const now=new Date();const rows=state.hourly.filter(x=>{const d=new Date(x.time);return d>=new Date(now.getTime()-3600000)&&isInShift(d)}).slice(0,12);forecast.innerHTML=rows.map(x=>{const d=new Date(x.time),lv=getLevel(x.hi),height=Math.max(28,Math.min(165,(x.hi-24)*11));return `<div class="hour ${x.hi>=35?'hot':''}" style="--level:${lv.color};--bar-height:${height}px"><div class="hour-bar">${x.hi.toFixed(1)}°</div><div class="hour-level">${lv.name}</div><div class="hour-time">${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}시</div></div>`}).join('')||'<div class="hint">선택한 근무시간의 남은 예보가 없습니다.</div>'}
 function updateField(){const t=parseFloat(tempInput.value),rh=parseFloat(rhInput.value),hi=heatIndex(t,rh);if(hi===null||rh<0||rh>100){state.fieldValue=null;fieldResult.textContent='값을 입력하세요';useField.disabled=true;return}state.fieldValue=hi;const lv=getLevel(hi);fieldResult.innerHTML=`<span style="color:${lv.color}">${hi.toFixed(1)}℃ · ${lv.name}</span>`;useField.disabled=false;if(state.source==='field')renderGuide()}
