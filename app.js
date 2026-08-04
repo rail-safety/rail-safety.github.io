@@ -228,16 +228,18 @@ if (state.job !== "platform") {
 target.innerHTML = "";
 return;
 }
-target.innerHTML = `<div class="support-panel">
-<h3>폭염 시 취약고객 안내</h3>
+target.innerHTML = `<details class="info-block home-support-block">
+<summary>폭염 시 취약고객 안내</summary>
+<div class="details-content">
 <ul>
-<li>고령자·어린이·임산부·거동 불편 고객의 장시간 더위 노출 확인</li>
-<li>어지럼·기력저하·비틀거림 발생 시 그늘 또는 냉방장소 안내</li>
-<li>혼자 이동하기 어려운 고객의 안전한 이동 지원 및 주변 직원 지원 요청</li>
-<li>의식·말투·걸음 이상 또는 상태 미회복 시 119 신고</li>
-<li>고객 지원으로 직원의 옥외 노출 장기화 시 즉시 추가 지원 요청</li>
+<li>고령자·어린이·임산부·거동이 불편한 고객이 장시간 더위에 노출되지 않도록 살피기</li>
+<li>어지럼·기력저하·비틀거림 등 이상징후가 보이면 그늘 또는 냉방장소로 안내</li>
+<li>혼자 이동하기 어려운 고객의 안전한 이동을 돕고 주변 직원에게 지원 요청</li>
+<li>의식·말투·걸음에 이상이 있거나 상태가 회복되지 않으면 119 신고</li>
+<li>고객 지원으로 직원의 옥외 노출이 길어지지 않도록 다른 직원에게 즉시 지원 요청</li>
 </ul>
-</div>`;
+</div>
+</details>`;
 }
 function renderGuide() {
 const value = state.source === "field" ? state.fieldValue : state.autoValue;
