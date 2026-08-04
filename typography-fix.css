@@ -1,0 +1,33 @@
+/* Korean line-wrap refinement: keep meaningful words together across mobile widths. */
+:where(
+  .hero__action p:last-child,
+  .forecast-advice,
+  .guide-summary,
+  .guide-text,
+  .support-panel li,
+  .details-content li,
+  .condition-row,
+  .condition-result p,
+  .emergency-banner span,
+  .standard-row span,
+  .standards-note,
+  .data-note,
+  .section-description
+) {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  line-break: strict;
+  hyphens: none;
+  text-wrap: pretty;
+}
+
+.support-panel li,
+.details-content li {
+  text-align: left;
+}
+
+@media (max-width: 340px) {
+  :where(.support-panel li, .details-content li, .guide-text) {
+    overflow-wrap: anywhere;
+  }
+}
