@@ -715,3 +715,233 @@ footer a { color: var(--brand-800); font-weight: 620; }
   .forecast-temp { font-size: 14px; }
 }
 /* semantic-color-patch:end */
+
+/* precision-density-patch:start */
+:root {
+  --shadow-soft: 0 1px 2px rgb(18 42 60 / 4%), 0 6px 18px rgb(18 42 60 / 4%);
+}
+.page-header { padding: 22px 0 14px; }
+.station-section { padding: 16px; }
+.section-inline-heading { margin-bottom: 10px; }
+.station-grid { gap: 5px; }
+.station-grid button {
+  min-height: 44px;
+  border-radius: 12px;
+  box-shadow: none;
+}
+.station-grid button[aria-pressed="true"] {
+  box-shadow: 0 3px 9px rgb(0 79 143 / 14%);
+}
+.hero {
+  margin-top: 16px;
+  padding: 22px 20px 19px;
+}
+.hero__reading { margin-top: 22px; }
+.hero__action { margin-top: 18px; padding-top: 14px; }
+.hero__action p:last-child {
+  font-size: clamp(18px, 5vw, 20px);
+  line-height: 1.42;
+  font-weight: 640;
+}
+.hero__meta { gap: 6px; margin-top: 13px; }
+.hero__meta span {
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.hero__updated { margin-top: 8px; font-size: 13px; }
+.data-note { margin-top: 9px; font-size: 13px; }
+.surface {
+  margin-top: 24px;
+  padding: 20px 18px;
+}
+.section-heading { margin-bottom: 14px; }
+.section-description { margin-top: 4px; }
+.segmented { gap: 4px; padding: 4px; border-radius: 14px; }
+.segmented button { min-height: 44px; padding: 7px 9px; }
+.segmented--soft button { min-height: 54px; }
+.segmented--soft button[aria-pressed="true"] {
+  background: #fff;
+  color: var(--brand-900);
+  box-shadow: 0 2px 6px rgb(31 54 69 / 10%);
+}
+.action-settings { gap: 10px; padding: 14px; border-radius: 16px; }
+.action-settings .setting-group:first-child .segmented button[aria-pressed="true"] {
+  background: #fff;
+  color: var(--brand-900);
+  box-shadow: inset 0 0 0 1px #b9d3e4;
+}
+.action-settings .setting-group:last-child .segmented button[aria-pressed="true"] {
+  background: var(--brand-800);
+  color: #fff;
+  box-shadow: none;
+}
+.forecast-highlight { margin-top: 14px; padding: 18px; }
+.forecast-facts { margin-top: 14px; padding-top: 12px; }
+.forecast-facts div { margin-top: 7px; }
+.forecast-advice { margin-top: 13px; padding: 11px 12px; }
+.hourly-block { margin-top: 17px; }
+.hourly-block__title { margin-bottom: 7px; }
+
+/* 시간별 전망은 단계별 행 전체 색상으로 위험 흐름을 보여준다. */
+.forecast-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 3px;
+}
+.forecast-item {
+  grid-template-columns: 48px minmax(0, 1fr) 64px;
+  min-height: 39px;
+  padding: 5px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--item-risk) 14%, #fff);
+}
+.forecast-item[data-current="true"] {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--item-risk) 42%, transparent);
+}
+.forecast-item[data-peak="true"] {
+  background: color-mix(in srgb, var(--item-risk) 20%, #fff);
+}
+.forecast-item[data-peak="true"] .forecast-temp {
+  color: var(--item-risk-dark);
+  font-weight: 800;
+}
+.forecast-time,
+.forecast-temp { color: var(--text-strong); }
+.forecast-level { color: var(--item-risk-dark); }
+.forecast-temp {
+  min-width: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  text-align: right;
+}
+.forecast-track::after {
+  background: color-mix(in srgb, var(--item-risk) 26%, var(--line));
+}
+.guide-header { margin-top: 20px; padding-top: 18px; }
+.guide-summary { margin-top: 8px; padding: 12px 13px; }
+.guide-list { margin-top: 10px; }
+.guide-item { gap: 10px; padding: 12px 2px; }
+.guide-text { line-height: 1.48; }
+
+/* 공통 안전정보는 흰색 기반으로 유지하고 위험도만 작은 포인트로 구분한다. */
+.emergency-banner {
+  padding: 13px 14px;
+  border: 0;
+  border-radius: 12px;
+  background: #fff0ef;
+}
+.emergency-banner strong { font-size: 18px; }
+.emergency-banner span { font-size: 15px; font-weight: 620; }
+.info-list {
+  display: block;
+  margin-top: 12px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.info-block {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  background: #fff;
+  color: var(--text);
+}
+.info-block:first-child { border-top: 0; }
+.info-block summary {
+  min-height: 50px;
+  padding: 9px 40px 9px 2px;
+  color: var(--text-strong);
+  font-size: 18px;
+  background: transparent;
+}
+.info-block summary::before {
+  width: 8px;
+  height: 8px;
+  margin-right: 10px;
+  background: var(--brand-800);
+}
+.info-block:nth-child(2) summary::before { background: var(--brand-800); }
+.info-block:nth-child(3) summary::before { background: #a56512; }
+.info-block:nth-child(4) summary::before { background: #b52a2a; }
+.info-block summary::after { right: 2px; color: var(--brand-800); }
+.info-block:nth-child(3) summary::after { color: #a56512; }
+.info-block:nth-child(4) summary::after { color: #b52a2a; }
+.details-content { padding: 0 2px 14px; }
+.details-content ul,
+.details-content ol { margin-top: 8px; }
+.details-content li { margin: 6px 0; }
+.check-intro { margin-bottom: 3px; font-size: 14px; }
+.condition-row {
+  min-height: 44px;
+  gap: 10px;
+  font-size: 16px;
+}
+.condition-row input {
+  width: 18px;
+  height: 18px;
+}
+.condition-result[hidden] { display: none; }
+.condition-result {
+  margin-top: 10px;
+  padding: 11px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: #f2f5f7;
+}
+.condition-result[data-severity="warning"] { background: #fff5e8; }
+.condition-result[data-severity="critical"] { background: #fff0ef; }
+.condition-result strong { font-size: 16px; }
+.condition-result p { font-size: 14px; }
+.microcopy { margin-top: 8px; font-size: 13px; }
+
+/* 응급조치는 펼친 경우에만 하나의 강한 위험 패널로 표시한다. */
+.info-block:nth-child(4)[open] {
+  margin: 10px 0;
+  padding: 0 14px 14px;
+  border: 0;
+  border-radius: 16px;
+  background: #8f2d27;
+  color: #fff;
+}
+.info-block:nth-child(4)[open] summary {
+  min-height: 52px;
+  padding-left: 0;
+  color: #fff;
+}
+.info-block:nth-child(4)[open] summary::before { background: #fff; }
+.info-block:nth-child(4)[open] summary::after { right: 0; color: #fff; }
+.info-block:nth-child(4)[open] .details-content,
+.info-block:nth-child(4)[open] .details-content li,
+.info-block:nth-child(4)[open] .subhead,
+.info-block:nth-child(4)[open] .subhead--danger { color: #fff; }
+.info-block:nth-child(4)[open] .details-content { padding: 0 0 2px; }
+.info-block:nth-child(4)[open] .call-button {
+  width: 100%;
+  margin-top: 12px;
+  background: #fff;
+  color: #8f2d27;
+}
+.contact-link { min-height: 52px; padding-block: 10px; }
+.utility-grid { gap: 24px; margin-top: 24px; }
+.standard-row { min-height: 56px; padding-block: 9px; }
+footer { padding-top: 24px; }
+
+@media (max-width: 420px) {
+  .station-section { padding: 14px; }
+  .hero { padding: 20px 17px 18px; }
+  .surface { padding: 18px 15px; }
+  .forecast-item {
+    grid-template-columns: 43px minmax(0, 1fr) 58px;
+    gap: 6px;
+    min-height: 38px;
+    padding-inline: 8px;
+  }
+  .forecast-time { font-size: 13px; }
+  .forecast-level { font-size: 11px; }
+  .forecast-temp { font-size: 14px; }
+}
+/* precision-density-patch:end */

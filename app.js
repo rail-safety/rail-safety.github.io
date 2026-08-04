@@ -320,8 +320,9 @@ function renderForecast() {
     const date = new Date(item.time);
     const level = getLevel(item.hi);
     const current = date.getHours() === now.getHours() && date.toDateString() === now.toDateString();
+    const peak = item.time === highest.time;
     const timeLabel = formatForecastHour(date);
-    return `<article class="forecast-item" data-current="${current}" style="--item-risk:${level.color};--item-risk-dark:${level.dark};--item-risk-soft:${level.soft}" aria-label="${timeLabel}, 체감온도 ${item.hi.toFixed(1)}도, ${level.name}">
+    return `<article class="forecast-item" data-current="${current}" data-peak="${peak}" style="--item-risk:${level.color};--item-risk-dark:${level.dark};--item-risk-soft:${level.soft}" aria-label="${timeLabel}, 체감온도 ${item.hi.toFixed(1)}도, ${level.name}">
       <time class="forecast-time" datetime="${item.time}">${timeLabel}</time>
       <div class="forecast-track"><span class="forecast-level">${level.name}</span></div>
       <div class="forecast-temp">${item.hi.toFixed(1)}℃</div>
@@ -403,27 +404,37 @@ function updateField() {
 
 function updateConditionCheck() {
   const selected = $$(".condition-check:checked").map((item) => item.value);
-  let title = "선택한 증상 없음";
-  let body = "근무 중 상태 변화 시 다시 확인";
-  let color = "#17834b";
+  const target = $("#conditionResult");
+
+  if (selected.length === 0) {
+    target.hidden = true;
+    target.innerHTML = "";
+    target.removeAttribute("data-severity");
+    return;
+  }
+
+  let title = "업무 강도·더위 노출 축소";
+  let body = "동료·관리자에게 상태 공유 · 악화 시 즉시 작업 중지";
+  let color = "#9a6500";
+  let severity = "caution";
+
   if (selected.includes("heat")) {
     title = "즉시 작업 중지 및 냉방장소 이동";
     body = "상태 공유 · 신속한 냉각 · 빠른 회복이 없으면 119 또는 의료기관 도움 요청";
     color = "#c72c2c";
+    severity = "critical";
   } else if (selected.includes("illness")) {
     title = "옥외작업 전 관리자 확인 필요";
     body = "탈수·체온 상승 위험 증가 · 시원한 장소에서 수분 보충 · 증상 지속 시 의료기관 안내";
     color = "#c45600";
-  } else if (selected.length >= 2 || selected.includes("fatigue")) {
-    title = "업무 강도·더위 노출 축소";
-    body = "동료·관리자에게 상태 공유 · 악화 시 즉시 작업 중지";
-    color = "#9a6500";
-  } else if (selected.includes("sleep")) {
+    severity = "warning";
+  } else if (selected.includes("sleep") && selected.length === 1) {
     title = "수면 상태 공유 및 무리한 작업 방지";
     body = "동료·관리자에게 사전 공유 · 휴식계획 확인";
-    color = "#9a6500";
   }
-  const target = $("#conditionResult");
+
+  target.hidden = false;
+  target.dataset.severity = severity;
   target.style.setProperty("--condition-color", color);
   target.innerHTML = `<strong>${title}</strong><p>${body}</p>`;
 }
@@ -466,6 +477,19 @@ $("#useField").addEventListener("click", () => {
   renderGuide();
   $("#action-title").scrollIntoView({ behavior: "smooth", block: "start" });
 });
+
+// accordion-single-open:start
+// 공통 안전정보는 현장에서 한 번에 하나만 펼쳐지도록 한다.
+const infoBlocks = $$(".info-block");
+infoBlocks.forEach((block) => block.addEventListener("toggle", () => {
+  if (!block.open) return;
+  infoBlocks.forEach((other) => {
+    if (other !== block) other.open = false;
+  });
+}));
+if (infoBlocks[0] && !infoBlocks.some((block) => block.open)) infoBlocks[0].open = true;
+
+// accordion-single-open:end
 
 $$(".condition-check").forEach((checkbox) => checkbox.addEventListener("change", updateConditionCheck));
 
