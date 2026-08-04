@@ -33,8 +33,11 @@ if station_count != 1:
 # 시간별 예보는 정시 단위이므로 야간 표시는 18:00~익일 08:00으로 맞춘다.
 index = index.replace("18:10~익일 09:00", "18:00~익일 08:00")
 
+# 새 자바스크립트와 스타일을 브라우저 캐시가 아닌 최신 파일로 강제 로드한다.
+index = re.sub(r'href="styles\.css(?:\?v=[^"]+)?"', 'href="styles.css?v=20260805-0750"', index, count=1)
+index = re.sub(r'src="app\.js(?:\?v=[^"]+)?"', 'src="app.js?v=20260805-0750"', index, count=1)
+
 # 주간은 09~18시, 야간은 당일 18시부터 익일 08시까지 하나의 연속 구간으로 표시한다.
-# 오전에 야간근무를 선택해도 이전 밤의 일부가 아니라 예보가 존재하는 다음 야간 전체를 보여준다.
 shift_functions = '''function getShiftWindow(now = new Date()) {
   const start = new Date(now);
   const end = new Date(now);
@@ -83,7 +86,6 @@ app, shift_count = re.subn(
 if shift_count != 1:
     raise SystemExit("app.js의 근무시간 예보 함수를 찾지 못했습니다.")
 
-# 기존 마크업에서 불필요한 첫 날짜 변수와 두 번째 인자를 제거한다.
 app = app.replace('  const firstDate = new Date(rows[0].time);\n', '')
 app = app.replace('const timeLabel = formatForecastHour(date, firstDate);', 'const timeLabel = formatForecastHour(date);')
 
@@ -92,6 +94,8 @@ required_markers = {
         'data-station="suncheon"',
         'data-station="gurye"',
         '18:00~익일 08:00',
+        'styles.css?v=20260805-0750',
+        'app.js?v=20260805-0750',
         'id="forecast"',
     ),
     "app.js": (
@@ -116,4 +120,4 @@ for filename, markers in required_markers.items():
 index_path.write_text(index, encoding="utf-8")
 app_path.write_text(app, encoding="utf-8")
 styles_path.write_text(styles, encoding="utf-8")
-print("야간근무 예보를 18시부터 익일 8시까지 시간순으로 반영했습니다.")
+print("야간근무 예보와 정적 파일 캐시 무효화를 반영했습니다.")
