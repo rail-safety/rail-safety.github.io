@@ -1,3 +1,5 @@
+@import url("typography-fix.css?v=20260805-0905");
+
 .hero__top-actions {
   display: flex;
   flex: 0 0 auto;
