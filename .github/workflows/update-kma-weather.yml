@@ -30,7 +30,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Patch site labels, KMA display and action guide
+      - name: Apply UI patch and verify structure
         run: python scripts/patch_index_for_kma.py
 
       - name: Fetch KMA current observations and forecast
