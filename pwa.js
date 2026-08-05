@@ -1,18 +1,21 @@
 (() => {
-  // dataRiskLevel: 시간별 전망과 요약 카드의 단계색을 동일한 기준으로 동기화한다.
+  // dataRiskLevel: 공식 단계 경계는 유지하고, 중간 명도의 스모키 안전 팔레트를 적용한다.
   const palette = {
-    normal: { color: "#567b68", dark: "#355444", soft: "#e4ece7" },
-    caution: { color: "#a47a31", dark: "#674a18", soft: "#f1e6cb" },
-    warning: { color: "#b9653f", dark: "#743a24", soft: "#efd6c8" },
-    danger: { color: "#a94743", dark: "#6d2b29", soft: "#eac9c7" },
-    extreme: { color: "#762f3b", dark: "#481c24", soft: "#dcbec4" }
+    normal: { color: "#4f6f5e", dark: "#30483b", soft: "#cbd8d0", panel: "#dee6e1" },
+    caution: { color: "#956b24", dark: "#5e4216", soft: "#dec787", panel: "#e8d9b2" },
+    warning: { color: "#a65332", dark: "#66321e", soft: "#d89b72", panel: "#e4bfa9" },
+    danger: { color: "#913d3a", dark: "#5c2725", soft: "#c97973", panel: "#dca9a6" },
+    extreme: { color: "#662633", dark: "#401820", soft: "#c17b86", panel: "#d3a0aa" }
   };
 
   const syncApplicationPalette = () => {
     if (typeof levels === "undefined" || !Array.isArray(levels)) return;
     levels.forEach((level) => {
       const colors = palette[level.key];
-      if (colors) Object.assign(level, colors);
+      if (!colors) return;
+      level.color = colors.color;
+      level.dark = colors.dark;
+      level.soft = colors.soft;
     });
   };
 
@@ -44,7 +47,7 @@
       const colors = palette[key];
       highlight.style.setProperty("--forecast-color", colors.color);
       highlight.style.setProperty("--forecast-dark", colors.dark);
-      highlight.style.setProperty("--forecast-soft", colors.soft);
+      highlight.style.setProperty("--forecast-soft", colors.panel);
     }
   };
 
