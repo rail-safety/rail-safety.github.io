@@ -50,10 +50,10 @@
 
     <section class="hero" aria-labelledby="current-status-title">
       <div class="hero__topline">
-        <p class="hero__source"><span class="status-dot" id="heroDot" aria-hidden="true"></span><span id="heroLocation">순천역 인근 자동값</span></p>
+        <p class="hero__source"><span class="status-dot" id="heroDot" aria-hidden="true"></span><span id="heroLocation">순천역 인근 기상청 관측값</span></p>
         <div class="hero__top-actions">
-          <span class="hero__source-chip" id="heroSource">기상청 실황</span>
-          <button class="hero__refresh" id="refreshWeather" type="button" aria-label="기상정보 새로고침">
+          <span class="hero__source-chip" id="heroSource" hidden>기상청 실황</span>
+          <button class="hero__refresh" id="refreshWeather" type="button" aria-label="기상청 관측값 다시 불러오기">
             <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0 1 5M20 4v7h-7" /></svg>
             <span class="hero__refresh-label">새로고침</span>
           </button>
@@ -96,7 +96,7 @@
 
       <div class="segmented segmented--soft" aria-label="근무시간 선택">
         <button type="button" data-shift="day" aria-pressed="true"><strong>주간근무</strong><span>09:00~18:40</span></button>
-        <button type="button" data-shift="night" aria-pressed="false"><strong>야간근무</strong><span>18:00~익일 08:00</span></button>
+        <button type="button" data-shift="night" aria-pressed="false"><strong>야간근무</strong><span>18:00~익일 09:00</span></button>
       </div>
 
       <div class="forecast-highlight" id="forecastHighlight" aria-live="polite">
@@ -313,8 +313,9 @@
   </main>
 
   <script src="app.js?v=20260805-1305"></script>
-  <script src="refresh.js?v=20260805-0850"></script>
+  <script src="refresh.js?v=20260805-1438"></script>
   <script src="pwa.js?v=20260805-1305"></script>
   <script src="forecast-bars.js?v=adeb4f397339"></script>
+  <script src="runtime-fixes.js?v=2eca5f78399f"></script>
 </body>
 </html>
