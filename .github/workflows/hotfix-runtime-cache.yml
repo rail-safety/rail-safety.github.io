@@ -17,18 +17,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Bump runtime asset versions
+      - name: Update runtime cache and validation markers
         run: |
           sed -i 's/20260805-1148/20260805-1305/g' index.html scripts/patch_index_for_kma.py
+          python - <<'PY'
+          from pathlib import Path
 
-      - name: Commit cache bust
+          path = Path('scripts/patch_index_for_kma.py')
+          text = path.read_text(encoding='utf-8')
+          old = '"pwa.js": (\'key: "interest"\', \'name: "관심 수준"\', \'name: "위험 수준"\', "officialCriteriaNote", "lockHeroToAutomaticWeather"),'
+          new = '"pwa.js": ("dataRiskLevel", "const palette", "applyRiskTheme", "initQuickActions"),'
+          if old in text:
+              text = text.replace(old, new)
+          elif new not in text:
+              raise SystemExit('pwa.js 검증 조건을 찾지 못했습니다.')
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit runtime hotfix
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html scripts/patch_index_for_kma.py
           if git diff --cached --quiet; then
-            echo "Cache version already current"
+            echo "Runtime hotfix already current"
           else
-            git commit -m "모바일 흰 화면 수정본 캐시 갱신"
+            git commit -m "자동 기상 갱신 검증 조건 정리"
             git push
           fi
