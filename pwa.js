@@ -40,6 +40,45 @@
     }
   };
 
+  // 상단 히어로는 항상 기상청 자동값만 표시한다.
+  // 현장 입력값은 아래 현장 업무 지침의 적용 기준에만 사용한다.
+  const lockHeroToAutomaticWeather = () => {
+    if (typeof renderHero !== "function") return;
+
+    renderHero = function renderAutomaticWeatherHero() {
+      const value = state.autoValue;
+      const temp = state.autoTemp;
+      const humidity = state.autoRh;
+      const observed = state.autoObserved;
+
+      $("#heroLocation").textContent = `${stationData[state.station].name} 인근 자동값`;
+      $("#heroSource").textContent = "기상청 실황";
+
+      if (value === null) {
+        $("#currentTemp").innerHTML = '--<span>℃</span>';
+        $("#currentBadge").innerHTML = '<span class="hero__level-icon" aria-hidden="true">·</span><strong>확인 중</strong>';
+        $("#currentAction").textContent = "기상정보를 확인하고 있습니다.";
+        $("#heroTemp").textContent = "기온 --℃";
+        $("#heroHumidity").textContent = "습도 --%";
+        $("#heroObserved").textContent = "관측시각 확인 중";
+        $("#updated").textContent = "최근 갱신정보 확인 중";
+        return;
+      }
+
+      const level = getLevel(value);
+      $(".hero").style.setProperty("--hero-risk", level.color);
+      $("#currentTemp").innerHTML = `${value.toFixed(1)}<span>℃</span>`;
+      $("#currentBadge").innerHTML = `<span class="hero__level-icon" aria-hidden="true">${level.symbol}</span><strong>${level.name}</strong>`;
+      $("#currentAction").textContent = guides[level.key].summary;
+      $("#heroTemp").textContent = `기온 ${Number.isFinite(temp) ? temp.toFixed(1) : "--"}℃`;
+      $("#heroHumidity").textContent = `습도 ${Number.isFinite(humidity) ? Math.round(humidity) : "--"}%`;
+      $("#heroObserved").textContent = `${formatTime(observed)} 관측`;
+      $("#updated").textContent = `${formatTime(state.generatedAt, true)} 기상자료 갱신`;
+    };
+
+    renderHero();
+  };
+
   const createDialog = () => {
     const dialog = document.createElement("dialog");
     dialog.className = "install-dialog";
@@ -66,6 +105,7 @@
   };
 
   const init = () => {
+    lockHeroToAutomaticWeather();
     applyRiskTheme();
     const observer = new MutationObserver(applyRiskTheme);
     observer.observe(document.body, { childList: true, subtree: true, characterData: true });
