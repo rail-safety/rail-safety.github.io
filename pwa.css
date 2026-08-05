@@ -33,12 +33,15 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.page-action-button__status {
-  min-width: 1px;
-}
+.page-action-button__status { min-width: 1px; }
 
-/* 시간별 행은 파스텔이 아닌 중간 명도의 스모키 안전 팔레트를 사용한다. */
+/* 시간별 체감온도 구간: 관심 미만-관심-주의-경고-위험 */
 .forecast-item[data-risk-level="normal"] {
+  --item-risk: #587080 !important;
+  --item-risk-dark: #344955 !important;
+  --item-risk-soft: #d5dfe4 !important;
+}
+.forecast-item[data-risk-level="interest"] {
   --item-risk: #4f6f5e !important;
   --item-risk-dark: #30483b !important;
   --item-risk-soft: #cbd8d0 !important;
@@ -54,28 +57,23 @@
   --item-risk-soft: #d89b72 !important;
 }
 .forecast-item[data-risk-level="danger"] {
-  --item-risk: #913d3a !important;
-  --item-risk-dark: #5c2725 !important;
-  --item-risk-soft: #c97973 !important;
-}
-.forecast-item[data-risk-level="extreme"] {
   --item-risk: #662633 !important;
   --item-risk-dark: #401820 !important;
   --item-risk-soft: #c17b86 !important;
 }
-.forecast-item {
-  background: var(--item-risk-soft) !important;
-}
+.forecast-item { background: var(--item-risk-soft) !important; }
 .forecast-item[data-peak="true"] {
   background: color-mix(in srgb, var(--item-risk) 10%, var(--item-risk-soft)) !important;
 }
 .forecast-time,
-.forecast-temp {
-  color: var(--text-strong) !important;
-}
+.forecast-temp { color: var(--text-strong) !important; }
 
-/* 큰 전망 카드는 같은 색축을 쓰되 행보다 한 단계 부드럽게 유지한다. */
 .forecast-highlight[data-risk-level="normal"] {
+  --forecast-color: #587080 !important;
+  --forecast-dark: #344955 !important;
+  --forecast-soft: #e6ecef !important;
+}
+.forecast-highlight[data-risk-level="interest"] {
   --forecast-color: #4f6f5e !important;
   --forecast-dark: #30483b !important;
   --forecast-soft: #dee6e1 !important;
@@ -91,15 +89,19 @@
   --forecast-soft: #e4bfa9 !important;
 }
 .forecast-highlight[data-risk-level="danger"] {
-  --forecast-color: #913d3a !important;
-  --forecast-dark: #5c2725 !important;
-  --forecast-soft: #dca9a6 !important;
-}
-.forecast-highlight[data-risk-level="extreme"] {
   --forecast-color: #662633 !important;
   --forecast-dark: #401820 !important;
   --forecast-soft: #d3a0aa !important;
 }
+
+.standard-row b {
+  color: var(--standard-color);
+  font-weight: 720;
+}
+.standard-row--interest { --standard-color: #4f6f5e; }
+.standard-row--caution { --standard-color: #956b24; }
+.standard-row--warning { --standard-color: #a65332; }
+.standard-row--danger { --standard-color: #662633; }
 
 .install-dialog {
   width: min(calc(100% - 32px), 440px);
