@@ -1,4 +1,10 @@
 (() => {
+  const heroCardStyles = document.createElement("link");
+  heroCardStyles.rel = "stylesheet";
+  heroCardStyles.href = "hero-card.css?v=a631c706d633";
+  heroCardStyles.dataset.designComponent = "hero-card";
+  document.head.append(heroCardStyles);
+
   const statusTokens = {
     brand: {
       surface: "var(--brand-surface)",
