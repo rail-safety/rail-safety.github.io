@@ -3,6 +3,8 @@ name: Deploy GitHub Pages
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'weather.json'
   workflow_dispatch:
 
 permissions:
@@ -38,5 +40,4 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-# 오래된 대기 배포를 취소하고 항상 최신 main만 게시
-# 2026-08-05 디자인 시스템 색상·모바일 밀도 최신본 재배포
+# 기상자료는 브라우저가 저장소 최신 원본을 직접 조회하므로 weather.json 커밋은 재배포하지 않음
