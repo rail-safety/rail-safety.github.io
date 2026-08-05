@@ -4,7 +4,7 @@
     "forecast": "기상청 단기예보"
   },
   "formula": "기상청 여름철 체감온도 산식",
-  "generatedAt": "2026-08-05T09:00:09+09:00",
+  "generatedAt": "2026-08-05T09:06:50+09:00",
   "currentBaseDate": "20260805",
   "currentBaseTime": "0800",
   "baseDate": "20260805",
