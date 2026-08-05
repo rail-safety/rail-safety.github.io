@@ -8,7 +8,9 @@ on:
       - 'forecast-bars.js'
       - 'design-tokens.css'
       - 'design-system.css'
+      - 'design-system.js'
       - 'hero-card.css'
+      - 'weather-loader.js'
       - '.github/workflows/sync-forecast-assets.yml'
 
 permissions:
@@ -24,6 +26,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
 
       - name: Update asset versions
         shell: bash
@@ -33,6 +38,7 @@ jobs:
           sed -i -E "s#forecast-bars\.js\?v=[^\"]+#forecast-bars.js?v=${VERSION}#" index.html
           sed -i -E "s#design-tokens\.css\?v=[^\"]+#design-tokens.css?v=${VERSION}#" index.html
           sed -i -E "s#design-system\.css\?v=[^\"]+#design-system.css?v=${VERSION}#" index.html
+          sed -i -E "s#design-system\.js\?v=[^\"]+#design-system.js?v=${VERSION}#" index.html
           sed -i -E "s#hero-card\.css\?v=[^\"]+#hero-card.css?v=${VERSION}#" index.html
 
       - name: Commit updated versions
@@ -44,7 +50,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "Asset versions are already current"
           else
-            git commit -m "디자인 시스템 정적 파일 캐시 갱신"
+            git commit -m "사이트 정적 파일 캐시 갱신"
             git pull --rebase origin main
             git push
           fi
