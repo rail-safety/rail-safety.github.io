@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""기상 갱신 전 최신 모바일 UI와 PWA 기능이 유지되는지 검증한다."""
+"""기상 갱신 전 공식 체감온도 구간과 모바일 UI 구조를 유지한다."""
 
 from pathlib import Path
 import re
@@ -24,205 +24,154 @@ pwa_script = pwa_script_path.read_text(encoding="utf-8")
 manifest = manifest_path.read_text(encoding="utf-8")
 service_worker = service_worker_path.read_text(encoding="utf-8")
 
-# 근무역 버튼은 한 줄에 들어가는 짧은 명칭과 고정 순서를 유지한다.
-station_buttons = '''<div class="station-grid" id="stationButtons" aria-label="근무역 선택">
-        <button type="button" data-station="suncheon" aria-pressed="true">순천</button>
-        <button type="button" data-station="gokseong" aria-pressed="false">곡성</button>
-        <button type="button" data-station="gurye" aria-pressed="false">구례구</button>
-        <button type="button" data-station="beolgyo" aria-pressed="false">벌교</button>
-        <button type="button" data-station="boseong" aria-pressed="false">보성</button>
-      </div>'''
-index, station_count = re.subn(
-    r'<div class="station-grid" id="stationButtons" aria-label="근무역 선택">.*?</div>',
-    station_buttons,
-    index,
+levels_block = '''const levels = [
+  { min: 38, key: "danger", name: "위험 수준", color: "#662633", dark: "#401820", soft: "#c17b86", symbol: "!", rank: 4 },
+  { min: 35, key: "warning", name: "경고 수준", color: "#a65332", dark: "#66321e", soft: "#d89b72", symbol: "!", rank: 3 },
+  { min: 33, key: "caution", name: "주의 수준", color: "#956b24", dark: "#5e4216", soft: "#dec787", symbol: "!", rank: 2 },
+  { min: 31, key: "interest", name: "관심 수준", color: "#4f6f5e", dark: "#30483b", soft: "#cbd8d0", symbol: "!", rank: 1 },
+  { min: -99, key: "normal", name: "관심 미만", color: "#587080", dark: "#344955", soft: "#d5dfe4", symbol: "✓", rank: 0 }
+];'''
+app, level_count = re.subn(r'const levels = \[.*?\n\];', levels_block, app, count=1, flags=re.S)
+if level_count != 1:
+    raise SystemExit("app.js의 체감온도 단계 배열을 찾지 못했습니다.")
+
+guides_block = '''const guides = {
+  normal: {
+    summary: "기본 예방수칙을 준비하고 체감온도 변화를 확인하세요.",
+    yard: ["작업 전 물·온열질환 예방용품 준비", "불필요한 옥외 대기와 이동 최소화", "작업 후 실내 또는 그늘에서 몸 상태 확인"],
+    platform: ["안내 전 물·온열질환 예방용품 준비", "승강장 대기 시 차양·그늘 우선 이용", "안내 사이 실내 복귀 및 몸 상태 확인"]
+  },
+  interest: {
+    summary: "폭염안전 5대 기본수칙을 적용하고 적절한 냉방휴식을 확보하세요.",
+    yard: ["시원한 물과 냉방·그늘 휴식공간 확보", "폭염 집중 시간대 작업 최소화 및 작업시간 조정 검토", "냉각조끼·넥쿨러 등 개인 보냉장구 준비", "작업 전후 본인과 동료의 온열질환 증상 확인"],
+    platform: ["시원한 물과 실내·그늘 휴식공간 확보", "안내 전 대기시간과 안내 후 승강장 체류 최소화", "냉각조끼·넥쿨러 등 개인 보냉장구 준비", "연속 안내 시 교대 또는 적절한 냉방휴식 확보"]
+  },
+  caution: {
+    summary: "매 2시간 이내 20분 이상 휴식하고 작업시간을 조정하세요.",
+    yard: ["매 2시간 이내 20분 이상 냉방·그늘 휴식", "작업시간대 조정 또는 옥외작업 단축", "온열질환 민감군·고강도 작업자는 휴식 추가", "2인 이상 상호 말투·걸음·반응 확인"],
+    platform: ["매 2시간 이내 20분 이상 냉방·그늘 휴식", "승강장 안내시간 단축 및 실내 복귀 동선 확보", "연속 안내 전 교대자와 휴식시간 지정", "온열질환 민감군·고강도 업무 담당자는 휴식 추가"]
+  },
+  warning: {
+    summary: "매시간 15분 휴식하고 무더위 시간대 옥외작업을 조정·중지하세요.",
+    yard: ["매시간 15분씩 냉방·그늘 휴식", "무더위 시간대에는 불가피한 경우 외 옥외작업 중지", "불가피한 작업은 최소 인원·최단시간 수행하고 휴식 충분히 부여", "담당자를 지정해 작업자의 건강상태 확인"],
+    platform: ["매시간 15분씩 냉방·그늘 휴식", "무더위 시간대 안내 인원·시간 조정 및 옥외 대기 제거", "연속 안내를 피하고 교대자·실내 복귀시간 지정", "담당자가 안내 직원과 인턴사원의 건강상태 확인"]
+  },
+  danger: {
+    summary: "재난·안전관리에 필요한 긴급조치 외 옥외작업을 중지하세요.",
+    yard: ["재난·안전관리에 필요한 긴급조치 외 옥외작업 중지", "긴급작업도 최소 인원·최단시간 수행하고 휴식 충분히 부여", "온열질환 민감군의 옥외작업 제한", "보냉장구·연락수단 확보 및 담당자의 건강상태 지속 확인", "말투·걸음·의식 이상 시 즉시 작업 중지 및 119 신고"],
+    platform: ["재난·안전관리에 필요한 긴급 안내 외 옥외업무 최소화", "긴급 안내 시 교대 운영하고 냉방휴식 충분히 부여", "온열질환 민감군의 장시간 승강장 업무 제한", "담당자가 직원·인턴사원의 건강상태 지속 확인", "말투·걸음·의식 이상 시 즉시 교대·냉각 및 119 신고"]
+  }
+};'''
+app, guide_count = re.subn(
+    r'const guides = \{.*?\n\};\n\nconst forecastAdvice',
+    guides_block + '\n\nconst forecastAdvice',
+    app,
     count=1,
     flags=re.S,
 )
-if station_count != 1:
-    raise SystemExit("index.html의 근무역 버튼 영역을 찾지 못했습니다.")
+if guide_count != 1:
+    raise SystemExit("app.js의 현장 지침 영역을 찾지 못했습니다.")
 
-# 정시 예보 기준 근무시간과 최신 정적 파일 버전을 유지한다.
-index = index.replace("18:10~익일 09:00", "18:00~익일 08:00")
-index = re.sub(r'href="styles\.css(?:\?v=[^"]+)?"', 'href="styles.css?v=20260805-0900"', index, count=1)
-index = re.sub(r'href="refresh\.css(?:\?v=[^"]+)?"', 'href="refresh.css?v=20260805-0910"', index, count=1)
-index = re.sub(r'src="app\.js(?:\?v=[^"]+)?"', 'src="app.js?v=20260805-0900"', index, count=1)
-index = re.sub(r'src="refresh\.js(?:\?v=[^"]+)?"', 'src="refresh.js?v=20260805-0850"', index, count=1)
+forecast_block = '''const forecastAdvice = {
+  normal: "기본 예방수칙을 준비하고 이후 체감온도 변화를 확인하세요.",
+  interest: "물·냉방휴식 장소·보냉장구를 준비하고 폭염 집중 시간대 노출을 줄이세요.",
+  caution: "매 2시간 이내 20분 이상 휴식하고 작업시간 조정·교대계획을 확인하세요.",
+  warning: "매시간 15분 휴식하고 무더위 시간대 옥외작업 조정·중지를 준비하세요.",
+  danger: "긴급조치 외 옥외작업을 중지하고 보냉·교대·응급연락체계를 확인하세요."
+};'''
+app, forecast_count = re.subn(r'const forecastAdvice = \{.*?\n\};', forecast_block, app, count=1, flags=re.S)
+if forecast_count != 1:
+    raise SystemExit("app.js의 전망 안내문 영역을 찾지 못했습니다.")
 
-# 홈 화면 설치용 메타데이터와 아이콘을 유지한다.
-index = re.sub(r'<meta name="theme-color" content="[^"]+"\s*/>', '<meta name="theme-color" content="#073b66" />', index, count=1)
-pwa_head = '''  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="폭염 안전 가이드" />
-  <link rel="manifest" href="manifest.webmanifest?v=20260805-0950" />
-  <link rel="icon" href="app-icon.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="apple-touch-icon.png" />'''
-if 'rel="manifest"' not in index:
-    index = index.replace('  <title>순천관리역 폭염 안전 가이드</title>', '  <title>순천관리역 폭염 안전 가이드</title>\n' + pwa_head, 1)
-else:
-    index = re.sub(r'href="manifest\.webmanifest(?:\?v=[^"]+)?"', 'href="manifest.webmanifest?v=20260805-0950"', index, count=1)
-    if 'apple-mobile-web-app-capable' not in index:
-        index = index.replace('  <title>순천관리역 폭염 안전 가이드</title>', '  <title>순천관리역 폭염 안전 가이드</title>\n' + pwa_head, 1)
+hero_block = '''function renderHero() {
+  const value = state.autoValue;
+  const temp = state.autoTemp;
+  const humidity = state.autoRh;
+  const observed = state.autoObserved;
 
-# 공유·홈 화면 추가 UI와 중간톤 위험단계 스타일을 연결한다.
-if 'href="pwa.css' not in index:
-    index = re.sub(
-        r'(  <link rel="stylesheet" href="refresh\.css\?v=[^"]+"\s*/>)',
-        r'\1\n  <link rel="stylesheet" href="pwa.css?v=20260805-1125" />',
-        index,
-        count=1,
-    )
-else:
-    index = re.sub(r'href="pwa\.css(?:\?v=[^"]+)?"', 'href="pwa.css?v=20260805-1125"', index, count=1)
+  $("#heroLocation").textContent = `${stationData[state.station].name} 인근 자동값`;
+  $("#heroSource").textContent = "기상청 실황";
 
-if 'src="pwa.js' not in index:
-    index = re.sub(
-        r'(  <script src="refresh\.js\?v=[^"]+"></script>)',
-        r'\1\n  <script src="pwa.js?v=20260805-1125"></script>',
-        index,
-        count=1,
-    )
-else:
-    index = re.sub(r'src="pwa\.js(?:\?v=[^"]+)?"', 'src="pwa.js?v=20260805-1125"', index, count=1)
+  if (value === null) {
+    $("#currentTemp").innerHTML = '--<span>℃</span>';
+    $("#currentBadge").innerHTML = '<span class="hero__level-icon" aria-hidden="true">·</span><strong>확인 중</strong>';
+    $("#currentAction").textContent = "기상정보를 확인하고 있습니다.";
+    $("#heroTemp").textContent = "기온 --℃";
+    $("#heroHumidity").textContent = "습도 --%";
+    $("#heroObserved").textContent = "관측시각 확인 중";
+    $("#updated").textContent = "최근 갱신정보 확인 중";
+    return;
+  }
 
-# 주요 섹션 제목은 한 문장으로 정리하고 동일한 제목 위계를 사용한다.
-index, contacts_count = re.subn(
-    r'<p class="section-kicker">순천관리역 비상연락망</p>\s*<h2 id="contacts-title">원터치 연락</h2>',
-    '<h2 id="contacts-title">비상연락망</h2>',
-    index,
-    count=1,
-)
-if contacts_count == 0 and '<h2 id="contacts-title">비상연락망</h2>' not in index:
-    raise SystemExit("비상연락망 제목을 찾지 못했습니다.")
+  const level = getLevel(value);
+  $(".hero").style.setProperty("--hero-risk", level.color);
+  $("#currentTemp").innerHTML = `${value.toFixed(1)}<span>℃</span>`;
+  $("#currentBadge").innerHTML = `<span class="hero__level-icon" aria-hidden="true">${level.symbol}</span><strong>${level.name}</strong>`;
+  $("#currentAction").textContent = guides[level.key].summary;
+  $("#heroTemp").textContent = `기온 ${Number.isFinite(temp) ? temp.toFixed(1) : "--"}℃`;
+  $("#heroHumidity").textContent = `습도 ${Number.isFinite(humidity) ? Math.round(humidity) : "--"}%`;
+  $("#heroObserved").textContent = `${formatTime(observed)} 관측`;
+  $("#updated").textContent = `${formatTime(state.generatedAt, true)} 기상자료 갱신`;
+}'''
+app, hero_count = re.subn(r'function renderHero\(\) \{.*?\n\}\n\nasync function loadWeather', hero_block + '\n\nasync function loadWeather', app, count=1, flags=re.S)
+if hero_count != 1:
+    raise SystemExit("app.js의 상단 자동값 카드 렌더링 함수를 찾지 못했습니다.")
 
-index, standards_count = re.subn(
-    r'<p class="section-kicker">2026 공식 기준</p>\s*<h2 id="standards-title">단계별 기준</h2>',
-    '<h2 id="standards-title">2026년 폭염 단계별 기준</h2>',
-    index,
-    count=1,
-)
-if standards_count == 0 and '<h2 id="standards-title">2026년 폭염 단계별 기준</h2>' not in index:
-    raise SystemExit("폭염 단계별 기준 제목을 찾지 못했습니다.")
+official_note = "시간별 체감온도 수치가 어느 구간에 해당하는지 보여주는 참고 표시입니다. 기상청 공식 폭염 영향예보는 일 최고 체감온도·지속일수·분야별 영향을 종합해 별도로 발표합니다. 실제 작업 판단은 현장 측정값과 회사 지침을 우선합니다."
+app = re.sub(r'\$\("#weatherMeta"\)\.textContent = `[^`]+`;', f'$("#weatherMeta").textContent = "{official_note}";', app, count=1)
 
-# 공통 안전정보는 오늘 컨디션 확인만 기본 펼침으로 시작한다.
-index = index.replace('<details class="info-block" open>', '<details class="info-block">')
-index, open_count = re.subn(
-    r'<details class="info-block">\s*<summary>오늘 컨디션 확인</summary>',
-    '<details class="info-block" open>\n          <summary>오늘 컨디션 확인</summary>',
-    index,
-    count=1,
-)
-if open_count != 1:
-    raise SystemExit("오늘 컨디션 확인 아코디언을 찾지 못했습니다.")
+# 최신 정적 파일 버전과 공식 단계 안내를 index.html에 유지한다.
+index = re.sub(r'href="pwa\.css(?:\?v=[^"]+)?"', 'href="pwa.css?v=20260805-1148"', index, count=1)
+index = re.sub(r'src="pwa\.js(?:\?v=[^"]+)?"', 'src="pwa.js?v=20260805-1148"', index, count=1)
+index = re.sub(r'src="app\.js(?:\?v=[^"]+)?"', 'src="app.js?v=20260805-1148"', index, count=1)
+index = index.replace('<h2 id="standards-title">2026년 폭염 단계별 기준</h2>', '<h2 id="standards-title">2026년 체감온도 구간별 대응 기준</h2>')
 
-# 미선택 상태에서는 결과 상자를 숨긴다. 반복 실행해도 동일한 결과가 되도록 처리한다.
-index, result_count = re.subn(
-    r'<div class="condition-result" id="conditionResult" aria-live="polite"(?: hidden)?>.*?</div>',
-    '<div class="condition-result" id="conditionResult" aria-live="polite" hidden></div>',
-    index,
-    count=1,
-    flags=re.S,
-)
-if result_count != 1:
-    raise SystemExit("컨디션 확인 결과 영역을 찾지 못했습니다.")
+standards_html = '''<div class="standards-list">
+          <div class="standard-row standard-row--interest"><strong>31℃</strong><span><b>관심 수준</b> · 폭염안전 5대 기본수칙 및 적절한 휴식</span></div>
+          <div class="standard-row standard-row--caution"><strong>33℃</strong><span><b>주의 수준</b> · 매 2시간 이내 20분 이상 휴식, 작업시간 조정·옥외작업 단축</span></div>
+          <div class="standard-row standard-row--warning"><strong>35℃</strong><span><b>경고 수준</b> · 매시간 15분 휴식, 무더위 시간대 불가피한 경우 외 옥외작업 중지</span></div>
+          <div class="standard-row standard-row--danger"><strong>38℃</strong><span><b>위험 수준</b> · 재난·안전관리 긴급조치 외 옥외작업 중지</span></div>
+        </div>'''
+index, standards_count = re.subn(r'<div class="standards-list">.*?</div>\s*<p class="standards-note">', standards_html + '\n        <p class="standards-note">', index, count=1, flags=re.S)
+if standards_count != 1:
+    raise SystemExit("index.html의 체감온도 기준표를 찾지 못했습니다.")
 
-required_markers = {
-    "index.html": (
-        'data-station="suncheon"',
-        'data-station="boseong"',
-        '18:00~익일 08:00',
-        'styles.css?v=20260805-0900',
-        'refresh.css?v=20260805-0910',
-        'pwa.css?v=20260805-1125',
-        'app.js?v=20260805-0900',
-        'refresh.js?v=20260805-0850',
-        'pwa.js?v=20260805-1125',
-        'manifest.webmanifest?v=20260805-0950',
-        'apple-touch-icon.png',
-        '<h2 id="forecast-title">오늘의 체감온도</h2>',
-        '<h2 id="action-title">현장 업무 지침</h2>',
-        '<h2 id="health-title">공통 안전정보</h2>',
-        '<h2 id="contacts-title">비상연락망</h2>',
-        '<h2 id="standards-title">2026년 폭염 단계별 기준</h2>',
-        '<details class="info-block" open>',
-        'id="conditionResult" aria-live="polite" hidden',
-    ),
-    "app.js": (
-        'start.setHours(18, 0, 0, 0)',
-        'end.setHours(8, 0, 0, 0)',
-        'return "24시"',
-        'data-peak="${peak}"',
-        'target.hidden = true',
-        '// accordion-single-open:start',
-    ),
-    "styles.css": (
-        '/* precision-density-patch:start */',
-        '.forecast-item[data-peak="true"]',
-        '.condition-result[hidden]',
-        '.info-block:nth-child(4)[open]',
-        '/* precision-density-patch:end */',
-    ),
-    "refresh.css": (
-        '@import url("typography-fix.css?v=20260805-0910")',
-        '.hero__refresh',
-    ),
-    "typography-fix.css": (
-        'word-break: keep-all',
-        'line-break: strict',
-        '.support-panel li',
-        '.details-content li',
-        '#forecast-title',
-        '#contacts-title',
-        '#standards-title',
-    ),
-    "pwa.css": (
-        '.page-quick-actions',
-        '#dec787',
-        '#d89b72',
-        '#c97973',
-        '#c17b86',
-        '.install-dialog',
-    ),
-    "pwa.js": (
-        'navigator.share',
-        'beforeinstallprompt',
-        'serviceWorker.register',
-        'dataRiskLevel',
-        'panel: "#e8d9b2"',
-        'lockHeroToAutomaticWeather',
-    ),
-    "manifest.webmanifest": (
-        '"display": "standalone"',
-        '"/icon-192.png"',
-        '"/icon-512.png"',
-    ),
-    "service-worker.js": (
-        'weather.json',
-        'cache: "no-store"',
-    ),
+standards_note = "위 단계명은 시간별 체감온도 수치의 구간 표시입니다. 기상청 공식 영향예보 단계는 일 최고 체감온도와 지속일수, 분야별 영향을 종합해 발표합니다. 작업장에서는 현장 체감온도와 고용노동부·안전보건공단 대응지침, 회사 폭염 대응계획을 함께 적용합니다."
+index = re.sub(r'<p class="standards-note">.*?</p>', f'<p class="standards-note">{standards_note}</p>', index, count=1, flags=re.S)
+
+required = {
+    "index.html": ("pwa.css?v=20260805-1148", "app.js?v=20260805-1148", "pwa.js?v=20260805-1148", "관심 수준", "주의 수준", "경고 수준", "위험 수준"),
+    "app.js": ('key: "interest"', 'name: "관심 수준"', 'name: "위험 수준"', "매 2시간 이내 20분 이상", "매시간 15분", "긴급조치 외 옥외작업 중지"),
+    "pwa.css": ('[data-risk-level="interest"]', '.standard-row--interest', '.standard-row--danger'),
+    "pwa.js": ('key: "interest"', 'name: "관심 수준"', 'name: "위험 수준"', "officialCriteriaNote", "lockHeroToAutomaticWeather"),
+    "refresh.css": ('.hero__refresh',),
+    "typography-fix.css": ('word-break: keep-all',),
+    "manifest.webmanifest": ('"display": "standalone"',),
+    "service-worker.js": ('weather.json', 'cache: "no-store"'),
 }
 
 sources = {
     "index.html": index,
     "app.js": app,
-    "styles.css": styles,
-    "refresh.css": refresh,
-    "typography-fix.css": typography,
     "pwa.css": pwa_style,
     "pwa.js": pwa_script,
+    "refresh.css": refresh,
+    "typography-fix.css": typography,
     "manifest.webmanifest": manifest,
     "service-worker.js": service_worker,
 }
-
-for filename, markers in required_markers.items():
-    source = sources[filename]
-    missing = [marker for marker in markers if marker not in source]
+for filename, markers in required.items():
+    missing = [marker for marker in markers if marker not in sources[filename]]
     if missing:
-        raise SystemExit(f"{filename} UI 구조 검증 실패: " + ", ".join(missing))
+        raise SystemExit(f"{filename} 공식 기준 검증 실패: " + ", ".join(missing))
+
+if "매우 위험" in app or "매우 위험" in pwa_script:
+    raise SystemExit("비공식 단계명 '매우 위험'이 남아 있습니다.")
 
 for icon_path in ("icon-192.png", "icon-512.png", "apple-touch-icon.png", "app-icon.svg"):
     if not Path(icon_path).exists():
         raise SystemExit(f"홈 화면 아이콘 누락: {icon_path}")
 
 index_path.write_text(index, encoding="utf-8")
-print("중간톤 위험단계 팔레트와 공유·설치 기능, 기존 모바일 UI를 확인했습니다.")
+app_path.write_text(app, encoding="utf-8")
+print("관심·주의·경고·위험 구간과 작업장 대응지침을 확인했습니다.")
