@@ -1,0 +1,74 @@
+/* 현재 체감온도 핵심 카드: 코레일 남색 고정, 단계색은 상태 표시만 사용 */
+.hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden !important;
+  border-color: var(--brand-accent) !important;
+  background: var(--brand-accent) !important;
+  color: var(--ds-surface) !important;
+  box-shadow: none !important;
+}
+
+.hero::after {
+  content: "";
+  display: block !important;
+  position: absolute;
+  z-index: -1;
+  right: -84px;
+  bottom: -110px;
+  width: 230px;
+  height: 230px;
+  border: 42px solid color-mix(in srgb, var(--ds-surface) 5%, transparent);
+  border-radius: 50%;
+}
+
+.hero__source,
+.hero__temperature,
+.hero__level strong,
+.hero__action p:last-child {
+  color: var(--ds-surface) !important;
+}
+
+.hero__eyebrow,
+.hero__action-label {
+  color: color-mix(in srgb, var(--ds-surface) 64%, transparent) !important;
+}
+
+.hero__updated {
+  color: color-mix(in srgb, var(--ds-surface) 54%, transparent) !important;
+}
+
+.status-dot {
+  background: var(--hero-solid) !important;
+  box-shadow: 0 0 0 7px color-mix(in srgb, var(--ds-surface) 7%, transparent) !important;
+}
+
+.hero__level-icon {
+  background: var(--hero-solid) !important;
+  color: var(--ds-surface) !important;
+}
+
+.hero__action {
+  border-color: color-mix(in srgb, var(--ds-surface) 20%, transparent) !important;
+}
+
+.hero__meta span {
+  border: 0 !important;
+  background: color-mix(in srgb, var(--ds-surface) 10%, transparent) !important;
+  color: color-mix(in srgb, var(--ds-surface) 80%, transparent) !important;
+}
+
+.hero__refresh {
+  border: 0 !important;
+  border-radius: var(--ds-pill-radius) !important;
+  background: color-mix(in srgb, var(--ds-surface) 11%, transparent) !important;
+  color: color-mix(in srgb, var(--ds-surface) 90%, transparent) !important;
+}
+
+.hero__refresh:hover {
+  background: color-mix(in srgb, var(--ds-surface) 17%, transparent) !important;
+}
+
+.hero__refresh:active {
+  background: color-mix(in srgb, var(--ds-surface) 22%, transparent) !important;
+}
