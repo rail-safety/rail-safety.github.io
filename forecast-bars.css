@@ -1,0 +1,174 @@
+/* 시간별 전망: 시간 | 단계점 | 온도 비례 막대 + 막대 끝 숫자 */
+.forecast-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 0 !important;
+  border-top: 1px solid var(--line) !important;
+}
+
+.forecast-item.forecast-item--bar {
+  display: grid !important;
+  grid-template-columns: 62px 8px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-height: 48px !important;
+  padding: 7px 2px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.forecast-item.forecast-item--bar[data-current="true"] {
+  margin-inline: -6px;
+  padding-inline: 8px !important;
+  border-radius: 10px !important;
+  background: #f3f7f9 !important;
+  box-shadow: inset 0 0 0 1px #d9e4ea !important;
+}
+
+.forecast-time-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.forecast-item--bar .forecast-time {
+  color: var(--text-strong) !important;
+  font-size: 14px !important;
+  font-weight: 660 !important;
+  line-height: 1 !important;
+  white-space: nowrap;
+}
+
+.forecast-peak-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 18px;
+  padding: 2px 5px;
+  border: 1px solid #ccd7dd;
+  border-radius: 999px;
+  background: #f7f9fa;
+  color: #405463;
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.forecast-risk-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--item-risk);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--item-risk) 12%, transparent);
+}
+
+.forecast-measure {
+  min-width: 0;
+}
+
+.forecast-bar-scale {
+  --bar-width: 50%;
+  position: relative;
+  width: calc(100% - 54px);
+  min-width: 76px;
+  height: 30px;
+}
+
+.forecast-bar-scale::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 10px;
+  height: 9px;
+  border-radius: 999px;
+  background: #e7ecef;
+}
+
+.forecast-bar-fill {
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: var(--bar-width);
+  height: 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--item-risk) 12%, #8195a1);
+}
+
+.forecast-bar-fill::after {
+  content: "";
+  position: absolute;
+  right: -1px;
+  top: 50%;
+  width: 3px;
+  height: 13px;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: var(--item-risk);
+}
+
+.forecast-temp-label {
+  position: absolute;
+  left: calc(var(--bar-width) + 7px);
+  top: 3px;
+  padding-bottom: 1px;
+  border-bottom: 2px solid color-mix(in srgb, var(--item-risk) 58%, transparent);
+  color: var(--text-strong);
+  font-size: 14px;
+  font-weight: 690;
+  line-height: 1.25;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.forecast-item--bar[data-peak="true"] .forecast-temp-label {
+  color: var(--item-risk-dark);
+  font-weight: 820;
+}
+
+.forecast-item--bar[data-peak="true"] .forecast-bar-fill {
+  background: color-mix(in srgb, var(--item-risk) 20%, #788d99);
+}
+
+@media (max-width: 420px) {
+  .forecast-item.forecast-item--bar {
+    grid-template-columns: 56px 7px minmax(0, 1fr) !important;
+    gap: 8px !important;
+    min-height: 46px !important;
+  }
+
+  .forecast-item--bar .forecast-time {
+    font-size: 13px !important;
+  }
+
+  .forecast-peak-badge {
+    padding-inline: 4px;
+    font-size: 9px;
+  }
+
+  .forecast-bar-scale {
+    width: calc(100% - 50px);
+    min-width: 64px;
+  }
+
+  .forecast-temp-label {
+    left: calc(var(--bar-width) + 6px);
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 350px) {
+  .forecast-item.forecast-item--bar {
+    grid-template-columns: 50px 6px minmax(0, 1fr) !important;
+    gap: 6px !important;
+  }
+
+  .forecast-bar-scale {
+    width: calc(100% - 47px);
+    min-width: 56px;
+  }
+}
