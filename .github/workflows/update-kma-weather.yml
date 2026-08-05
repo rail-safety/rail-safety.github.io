@@ -8,19 +8,21 @@ on:
       - 'scripts/fetch_kma.py'
   workflow_dispatch:
   schedule:
-    - cron: '*/5 * * * *'
+    # 예약 실행은 지연될 수 있으므로 매시간 감시 작업만 시작하고,
+    # 시작된 작업이 내부에서 5분마다 연속 조회한다.
+    - cron: '7 * * * *'
 
 permissions:
   contents: write
 
 concurrency:
-  group: update-kma-weather
+  group: update-kma-weather-watch
   cancel-in-progress: true
 
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 135
     steps:
       - name: Checkout latest main
         uses: actions/checkout@v4
@@ -42,20 +44,42 @@ jobs:
             exit 1
           fi
 
-      - name: Fetch latest KMA observations
+      - name: Poll latest KMA observations every 5 minutes
         env:
           KMA_SERVICE_KEY: ${{ secrets.KMA_SERVICE_KEY }}
-        run: python scripts/fetch_kma.py
-
-      - name: Commit only when weather data changed
+        shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add weather.json
-          if git diff --cached --quiet; then
-            echo "No new KMA observation or forecast"
-          else
-            git commit -m "기상청 실황·예보 자동 갱신"
-            git pull --rebase origin main
-            git push
-          fi
+
+          # 한 작업이 125분 동안 살아 있으므로 다음 매시간 예약이 늦거나
+          # 한 차례 누락돼도 기존 작업이 계속 최신 실황을 확인한다.
+          for attempt in $(seq 1 25); do
+            echo "KMA poll ${attempt}/25 - $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M:%S KST')"
+
+            # 장시간 실행 중 다른 디자인 커밋이 들어와도 충돌하지 않게 최신 main을 먼저 반영한다.
+            git pull --rebase origin main || {
+              echo "::warning::최신 main 동기화 실패, 다음 주기에 재시도합니다."
+              git rebase --abort 2>/dev/null || true
+            }
+
+            if python scripts/fetch_kma.py; then
+              git add weather.json
+              if git diff --cached --quiet; then
+                echo "새 기상청 관측값 없음"
+              else
+                git commit -m "기상청 실황·예보 자동 갱신"
+                if ! git pull --rebase origin main || ! git push; then
+                  echo "::warning::기상자료 push 실패, 다음 주기에 다시 시도합니다."
+                  git rebase --abort 2>/dev/null || true
+                  git reset --mixed HEAD~1 2>/dev/null || true
+                fi
+              fi
+            else
+              echo "::warning::기상청 조회 실패, 5분 뒤 다시 시도합니다."
+            fi
+
+            if [ "$attempt" -lt 25 ]; then
+              sleep 300
+            fi
+          done
