@@ -1,0 +1,44 @@
+name: Sync forecast asset versions
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'forecast-bars.css'
+      - 'forecast-bars.js'
+      - '.github/workflows/sync-forecast-assets.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-forecast-assets
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update forecast asset versions
+        shell: bash
+        run: |
+          VERSION="${GITHUB_SHA::12}"
+          sed -i -E "s#forecast-bars\.css\?v=[^\"]+#forecast-bars.css?v=${VERSION}#" index.html
+          sed -i -E "s#forecast-bars\.js\?v=[^\"]+#forecast-bars.js?v=${VERSION}#" index.html
+
+      - name: Commit updated versions
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "Forecast asset versions are already current"
+          else
+            git commit -m "시간별 전망 정적 파일 캐시 갱신"
+            git pull --rebase origin main
+            git push
+          fi
