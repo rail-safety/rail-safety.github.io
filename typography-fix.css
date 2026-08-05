@@ -26,6 +26,20 @@
   text-align: left;
 }
 
+/* Main section titles share one visual hierarchy from forecast to standards. */
+#forecast-title,
+#action-title,
+#health-title,
+#contacts-title,
+#standards-title {
+  margin: 0;
+  color: var(--text-strong);
+  font-size: clamp(24px, 6.4vw, 28px);
+  line-height: 1.3;
+  font-weight: 650;
+  letter-spacing: -.035em;
+}
+
 @media (max-width: 340px) {
   :where(.support-panel li, .details-content li, .guide-text) {
     overflow-wrap: anywhere;
