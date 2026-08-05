@@ -37,31 +37,31 @@
   min-width: 1px;
 }
 
-/* 단계색은 장식이 아니라 시간별 위험 흐름을 즉시 구분하는 용도로만 사용한다. */
+/* 단계색은 세이지-오커-테라코타-브릭-버건디의 톤다운 색축을 사용한다. */
 .forecast-item[data-risk-level="normal"] {
-  --item-risk: #23824f !important;
-  --item-risk-dark: #0f5d36 !important;
-  --item-risk-soft: #e2f3e8 !important;
+  --item-risk: #567b68 !important;
+  --item-risk-dark: #355444 !important;
+  --item-risk-soft: #e4ece7 !important;
 }
 .forecast-item[data-risk-level="caution"] {
-  --item-risk: #b97800 !important;
-  --item-risk-dark: #6b4500 !important;
-  --item-risk-soft: #fff0a8 !important;
+  --item-risk: #a47a31 !important;
+  --item-risk-dark: #674a18 !important;
+  --item-risk-soft: #f1e6cb !important;
 }
 .forecast-item[data-risk-level="warning"] {
-  --item-risk: #e56500 !important;
-  --item-risk-dark: #883600 !important;
-  --item-risk-soft: #ffd3a3 !important;
+  --item-risk: #b9653f !important;
+  --item-risk-dark: #743a24 !important;
+  --item-risk-soft: #efd6c8 !important;
 }
 .forecast-item[data-risk-level="danger"] {
-  --item-risk: #d92d20 !important;
-  --item-risk-dark: #8c1d17 !important;
-  --item-risk-soft: #f8c0bc !important;
+  --item-risk: #a94743 !important;
+  --item-risk-dark: #6d2b29 !important;
+  --item-risk-soft: #eac9c7 !important;
 }
 .forecast-item[data-risk-level="extreme"] {
-  --item-risk: #8e1b1b !important;
-  --item-risk-dark: #571010 !important;
-  --item-risk-soft: #eaa5a5 !important;
+  --item-risk: #762f3b !important;
+  --item-risk-dark: #481c24 !important;
+  --item-risk-soft: #dcbec4 !important;
 }
 .forecast-item {
   background: var(--item-risk-soft) !important;
@@ -75,29 +75,29 @@
 }
 
 .forecast-highlight[data-risk-level="normal"] {
-  --forecast-color: #23824f !important;
-  --forecast-dark: #0f5d36 !important;
-  --forecast-soft: #e2f3e8 !important;
+  --forecast-color: #567b68 !important;
+  --forecast-dark: #355444 !important;
+  --forecast-soft: #e4ece7 !important;
 }
 .forecast-highlight[data-risk-level="caution"] {
-  --forecast-color: #b97800 !important;
-  --forecast-dark: #6b4500 !important;
-  --forecast-soft: #fff0a8 !important;
+  --forecast-color: #a47a31 !important;
+  --forecast-dark: #674a18 !important;
+  --forecast-soft: #f1e6cb !important;
 }
 .forecast-highlight[data-risk-level="warning"] {
-  --forecast-color: #e56500 !important;
-  --forecast-dark: #883600 !important;
-  --forecast-soft: #ffd3a3 !important;
+  --forecast-color: #b9653f !important;
+  --forecast-dark: #743a24 !important;
+  --forecast-soft: #efd6c8 !important;
 }
 .forecast-highlight[data-risk-level="danger"] {
-  --forecast-color: #d92d20 !important;
-  --forecast-dark: #8c1d17 !important;
-  --forecast-soft: #f8c0bc !important;
+  --forecast-color: #a94743 !important;
+  --forecast-dark: #6d2b29 !important;
+  --forecast-soft: #eac9c7 !important;
 }
 .forecast-highlight[data-risk-level="extreme"] {
-  --forecast-color: #8e1b1b !important;
-  --forecast-dark: #571010 !important;
-  --forecast-soft: #eaa5a5 !important;
+  --forecast-color: #762f3b !important;
+  --forecast-dark: #481c24 !important;
+  --forecast-soft: #dcbec4 !important;
 }
 
 .install-dialog {
