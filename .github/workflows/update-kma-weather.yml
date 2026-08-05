@@ -21,6 +21,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -41,8 +42,17 @@ jobs:
           if git diff --cached --quiet; then
             echo "No UI changes to commit"
           else
-            git commit -m "야간근무 예보 표시 및 정적 파일 캐시 갱신"
+            git commit -m "기상 연동 화면 구조 검증"
             git push
+          fi
+
+      - name: Verify KMA service key
+        env:
+          KMA_SERVICE_KEY: ${{ secrets.KMA_SERVICE_KEY }}
+        run: |
+          if [ -z "$KMA_SERVICE_KEY" ]; then
+            echo "::error::KMA_SERVICE_KEY 저장소 비밀값이 설정되지 않았습니다."
+            exit 1
           fi
 
       - name: Fetch KMA current observations and forecast
