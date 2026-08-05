@@ -4,9 +4,9 @@
     "forecast": "기상청 단기예보"
   },
   "formula": "기상청 여름철 체감온도 산식",
-  "generatedAt": "2026-08-06T07:04:38+09:00",
+  "generatedAt": "2026-08-06T07:09:50+09:00",
   "currentBaseDate": "20260806",
-  "currentBaseTime": "0600",
+  "currentBaseTime": "0700",
   "baseDate": "20260806",
   "baseTime": "0500",
   "stations": {
@@ -15,9 +15,9 @@
       "nx": 70,
       "ny": 70,
       "current": {
-        "time": "2026-08-06T06:00+09:00",
-        "temp": 26.5,
-        "rh": 92,
+        "time": "2026-08-06T07:00+09:00",
+        "temp": 26.6,
+        "rh": 91,
         "hi": 29.4,
         "source": "초단기실황"
       },
