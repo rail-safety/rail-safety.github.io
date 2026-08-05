@@ -9,7 +9,7 @@ on:
       - 'scripts/patch_index_for_kma.py'
   workflow_dispatch:
   schedule:
-    - cron: '20 * * * *'
+    - cron: '50 * * * *'
 
 permissions:
   contents: write
