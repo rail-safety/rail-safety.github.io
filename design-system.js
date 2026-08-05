@@ -1,10 +1,4 @@
 (() => {
-  const heroCardStyles = document.createElement("link");
-  heroCardStyles.rel = "stylesheet";
-  heroCardStyles.href = "hero-card.css?v=a631c706d633";
-  heroCardStyles.dataset.designComponent = "hero-card";
-  document.head.append(heroCardStyles);
-
   const statusTokens = {
     brand: {
       surface: "var(--brand-surface)",
@@ -44,7 +38,7 @@
   };
 
   const levelKeyToStatus = {
-    normal: "safe",
+    normal: "brand",
     interest: "safe",
     caution: "caution",
     warning: "warning",
@@ -56,7 +50,8 @@
     if (text.includes("위험")) return "danger";
     if (text.includes("경고")) return "warning";
     if (text.includes("주의") || text.includes("갱신 지연")) return "caution";
-    if (text.includes("관심") || text.includes("미만")) return "safe";
+    if (text.includes("미만")) return "brand";
+    if (text.includes("관심")) return "safe";
     return "brand";
   };
 
@@ -86,7 +81,9 @@
 
   const applyGuideStatus = (level) => {
     const root = document.documentElement;
-    const status = level ? statusFromLevel(level) : statusFromText(document.querySelector("#guideStatus")?.textContent || "");
+    const status = level
+      ? statusFromLevel(level)
+      : statusFromText(document.querySelector("#guideStatus")?.textContent || "");
     const token = statusTokens[status];
 
     setImportant(root, "--risk", token.solid);
@@ -100,6 +97,34 @@
       dot.style.boxShadow = "none";
     }
   };
+
+  const runtimeStyle = document.createElement("style");
+  runtimeStyle.dataset.designSystemRuntime = "true";
+  runtimeStyle.textContent = `
+    html .forecast-item[data-risk-level="normal"] {
+      --item-risk: var(--brand-solid) !important;
+      --item-risk-dark: var(--brand-accent) !important;
+      --item-risk-soft: var(--brand-surface) !important;
+      --label-bg: var(--brand-solid) !important;
+      --label-text: var(--ds-surface) !important;
+      --stage-text: var(--brand-accent) !important;
+    }
+
+    html .forecast-highlight[data-risk-level="normal"] {
+      --forecast-surface: var(--brand-surface) !important;
+      --forecast-border: var(--brand-border) !important;
+      --forecast-text: var(--brand-text) !important;
+      --forecast-solid: var(--brand-solid) !important;
+      --forecast-accent: var(--brand-accent) !important;
+    }
+
+    html .standard-row small {
+      font-size: inherit !important;
+      line-height: inherit !important;
+      color: inherit !important;
+    }
+  `;
+  document.head.append(runtimeStyle);
 
   if (typeof levels !== "undefined" && Array.isArray(levels)) {
     levels.forEach((level) => {
@@ -116,6 +141,22 @@
   if (typeof applyGuideTheme === "function") {
     applyGuideTheme = function applyTokenGuideTheme(level) {
       applyGuideStatus(level);
+    };
+  }
+
+  if (typeof renderForecast === "function") {
+    const baseRenderForecast = renderForecast;
+    renderForecast = function renderTokenForecast() {
+      baseRenderForecast();
+      if (typeof getForecastRows !== "function" || typeof getLevel !== "function") return;
+      const rows = getForecastRows();
+      const highlight = document.querySelector("#forecastHighlight");
+      if (!highlight || rows.length === 0) {
+        highlight?.removeAttribute("data-risk-level");
+        return;
+      }
+      const highest = rows.reduce((max, item) => item.hi > max.hi ? item : max, rows[0]);
+      highlight.dataset.riskLevel = getLevel(highest.hi).key;
     };
   }
 
@@ -141,4 +182,11 @@
   observeText("#guideStatus", () => applyGuideStatus());
 
   refreshDynamicUI();
+
+  if (!document.querySelector('script[data-weather-loader="true"]')) {
+    const weatherLoader = document.createElement("script");
+    weatherLoader.src = `weather-loader.js?v=${Date.now()}`;
+    weatherLoader.dataset.weatherLoader = "true";
+    document.body.append(weatherLoader);
+  }
 })();
