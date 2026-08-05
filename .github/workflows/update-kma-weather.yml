@@ -8,7 +8,7 @@ on:
       - 'scripts/fetch_kma.py'
   workflow_dispatch:
   schedule:
-    - cron: '50 * * * *'
+    - cron: '20,50 * * * *'
 
 permissions:
   contents: write
