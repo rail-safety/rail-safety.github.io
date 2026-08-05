@@ -121,9 +121,9 @@ official_note = "시간별 체감온도 수치가 어느 구간에 해당하는�
 app = re.sub(r'\$\("#weatherMeta"\)\.textContent = `[^`]+`;', f'$("#weatherMeta").textContent = "{official_note}";', app, count=1)
 
 # 최신 정적 파일 버전과 공식 단계 안내를 index.html에 유지한다.
-index = re.sub(r'href="pwa\.css(?:\?v=[^"]+)?"', 'href="pwa.css?v=20260805-1148"', index, count=1)
-index = re.sub(r'src="pwa\.js(?:\?v=[^"]+)?"', 'src="pwa.js?v=20260805-1148"', index, count=1)
-index = re.sub(r'src="app\.js(?:\?v=[^"]+)?"', 'src="app.js?v=20260805-1148"', index, count=1)
+index = re.sub(r'href="pwa\.css(?:\?v=[^"]+)?"', 'href="pwa.css?v=20260805-1305"', index, count=1)
+index = re.sub(r'src="pwa\.js(?:\?v=[^"]+)?"', 'src="pwa.js?v=20260805-1305"', index, count=1)
+index = re.sub(r'src="app\.js(?:\?v=[^"]+)?"', 'src="app.js?v=20260805-1305"', index, count=1)
 index = index.replace('<h2 id="standards-title">2026년 폭염 단계별 기준</h2>', '<h2 id="standards-title">2026년 체감온도 구간별 대응 기준</h2>')
 
 standards_html = '''<div class="standards-list">
@@ -140,7 +140,7 @@ standards_note = "위 단계명은 시간별 체감온도 수치의 구간 표�
 index = re.sub(r'<p class="standards-note">.*?</p>', f'<p class="standards-note">{standards_note}</p>', index, count=1, flags=re.S)
 
 required = {
-    "index.html": ("pwa.css?v=20260805-1148", "app.js?v=20260805-1148", "pwa.js?v=20260805-1148", "관심 수준", "주의 수준", "경고 수준", "위험 수준"),
+    "index.html": ("pwa.css?v=20260805-1305", "app.js?v=20260805-1305", "pwa.js?v=20260805-1305", "관심 수준", "주의 수준", "경고 수준", "위험 수준"),
     "app.js": ('key: "interest"', 'name: "관심 수준"', 'name: "위험 수준"', "매 2시간 이내 20분 이상", "매시간 15분", "긴급조치 외 옥외작업 중지"),
     "pwa.css": ('[data-risk-level="interest"]', '.standard-row--interest', '.standard-row--danger'),
     "pwa.js": ('key: "interest"', 'name: "관심 수준"', 'name: "위험 수준"', "officialCriteriaNote", "lockHeroToAutomaticWeather"),
