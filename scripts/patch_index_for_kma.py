@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""기상 갱신 전 최신 모바일 UI 구조가 유지되는지 검증한다."""
+"""기상 갱신 전 최신 모바일 UI와 PWA 기능이 유지되는지 검증한다."""
 
 from pathlib import Path
 import re
@@ -9,12 +9,20 @@ app_path = Path("app.js")
 styles_path = Path("styles.css")
 refresh_path = Path("refresh.css")
 typography_path = Path("typography-fix.css")
+pwa_style_path = Path("pwa.css")
+pwa_script_path = Path("pwa.js")
+manifest_path = Path("manifest.webmanifest")
+service_worker_path = Path("service-worker.js")
 
 index = index_path.read_text(encoding="utf-8")
 app = app_path.read_text(encoding="utf-8")
 styles = styles_path.read_text(encoding="utf-8")
 refresh = refresh_path.read_text(encoding="utf-8")
 typography = typography_path.read_text(encoding="utf-8")
+pwa_style = pwa_style_path.read_text(encoding="utf-8")
+pwa_script = pwa_script_path.read_text(encoding="utf-8")
+manifest = manifest_path.read_text(encoding="utf-8")
+service_worker = service_worker_path.read_text(encoding="utf-8")
 
 # 근무역 버튼은 한 줄에 들어가는 짧은 명칭과 고정 순서를 유지한다.
 station_buttons = '''<div class="station-grid" id="stationButtons" aria-label="근무역 선택">
@@ -39,6 +47,43 @@ index = index.replace("18:10~익일 09:00", "18:00~익일 08:00")
 index = re.sub(r'href="styles\.css(?:\?v=[^"]+)?"', 'href="styles.css?v=20260805-0900"', index, count=1)
 index = re.sub(r'href="refresh\.css(?:\?v=[^"]+)?"', 'href="refresh.css?v=20260805-0910"', index, count=1)
 index = re.sub(r'src="app\.js(?:\?v=[^"]+)?"', 'src="app.js?v=20260805-0900"', index, count=1)
+index = re.sub(r'src="refresh\.js(?:\?v=[^"]+)?"', 'src="refresh.js?v=20260805-0850"', index, count=1)
+
+# 홈 화면 설치용 메타데이터와 아이콘을 유지한다.
+index = re.sub(r'<meta name="theme-color" content="[^"]+"\s*/>', '<meta name="theme-color" content="#073b66" />', index, count=1)
+pwa_head = '''  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="폭염 안전 가이드" />
+  <link rel="manifest" href="manifest.webmanifest?v=20260805-0950" />
+  <link rel="icon" href="app-icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />'''
+if 'rel="manifest"' not in index:
+    index = index.replace('  <title>순천관리역 폭염 안전 가이드</title>', '  <title>순천관리역 폭염 안전 가이드</title>\n' + pwa_head, 1)
+else:
+    index = re.sub(r'href="manifest\.webmanifest(?:\?v=[^"]+)?"', 'href="manifest.webmanifest?v=20260805-0950"', index, count=1)
+    if 'apple-mobile-web-app-capable' not in index:
+        index = index.replace('  <title>순천관리역 폭염 안전 가이드</title>', '  <title>순천관리역 폭염 안전 가이드</title>\n' + pwa_head, 1)
+
+# 공유·홈 화면 추가 UI와 단계색 보정 스타일을 연결한다.
+if 'href="pwa.css' not in index:
+    index = re.sub(
+        r'(  <link rel="stylesheet" href="refresh\.css\?v=[^"]+"\s*/>)',
+        r'\1\n  <link rel="stylesheet" href="pwa.css?v=20260805-0950" />',
+        index,
+        count=1,
+    )
+else:
+    index = re.sub(r'href="pwa\.css(?:\?v=[^"]+)?"', 'href="pwa.css?v=20260805-0950"', index, count=1)
+
+if 'src="pwa.js' not in index:
+    index = re.sub(
+        r'(  <script src="refresh\.js\?v=[^"]+"></script>)',
+        r'\1\n  <script src="pwa.js?v=20260805-0950"></script>',
+        index,
+        count=1,
+    )
+else:
+    index = re.sub(r'src="pwa\.js(?:\?v=[^"]+)?"', 'src="pwa.js?v=20260805-0950"', index, count=1)
 
 # 주요 섹션 제목은 한 문장으로 정리하고 동일한 제목 위계를 사용한다.
 index, contacts_count = re.subn(
@@ -88,7 +133,12 @@ required_markers = {
         '18:00~익일 08:00',
         'styles.css?v=20260805-0900',
         'refresh.css?v=20260805-0910',
+        'pwa.css?v=20260805-0950',
         'app.js?v=20260805-0900',
+        'refresh.js?v=20260805-0850',
+        'pwa.js?v=20260805-0950',
+        'manifest.webmanifest?v=20260805-0950',
+        'apple-touch-icon.png',
         '<h2 id="forecast-title">오늘의 체감온도</h2>',
         '<h2 id="action-title">현장 업무 지침</h2>',
         '<h2 id="health-title">공통 안전정보</h2>',
@@ -107,7 +157,6 @@ required_markers = {
     ),
     "styles.css": (
         '/* precision-density-patch:start */',
-        'background: color-mix(in srgb, var(--item-risk) 14%, #fff)',
         '.forecast-item[data-peak="true"]',
         '.condition-result[hidden]',
         '.info-block:nth-child(4)[open]',
@@ -126,6 +175,28 @@ required_markers = {
         '#contacts-title',
         '#standards-title',
     ),
+    "pwa.css": (
+        '.page-quick-actions',
+        '[data-risk-level="caution"]',
+        '[data-risk-level="warning"]',
+        '[data-risk-level="danger"]',
+        '.install-dialog',
+    ),
+    "pwa.js": (
+        'navigator.share',
+        'beforeinstallprompt',
+        'serviceWorker.register',
+        'dataRiskLevel',
+    ),
+    "manifest.webmanifest": (
+        '"display": "standalone"',
+        '"/icon-192.png"',
+        '"/icon-512.png"',
+    ),
+    "service-worker.js": (
+        'weather.json',
+        'cache: "no-store"',
+    ),
 }
 
 sources = {
@@ -134,6 +205,10 @@ sources = {
     "styles.css": styles,
     "refresh.css": refresh,
     "typography-fix.css": typography,
+    "pwa.css": pwa_style,
+    "pwa.js": pwa_script,
+    "manifest.webmanifest": manifest,
+    "service-worker.js": service_worker,
 }
 
 for filename, markers in required_markers.items():
@@ -142,5 +217,9 @@ for filename, markers in required_markers.items():
     if missing:
         raise SystemExit(f"{filename} UI 구조 검증 실패: " + ", ".join(missing))
 
+for icon_path in ("icon-192.png", "icon-512.png", "apple-touch-icon.png", "app-icon.svg"):
+    if not Path(icon_path).exists():
+        raise SystemExit(f"홈 화면 아이콘 누락: {icon_path}")
+
 index_path.write_text(index, encoding="utf-8")
-print("주요 섹션 제목과 최신 모바일 UI, 기상 갱신 호환성을 확인했습니다.")
+print("공유·홈 화면 설치 기능과 단계별 색상, 기존 모바일 UI를 확인했습니다.")
