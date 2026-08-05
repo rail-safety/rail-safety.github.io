@@ -47,7 +47,7 @@
     $("#forecastHotWindow").textContent = getHotWindow(rows, highest);
     $("#forecastTrend").textContent = trend;
     $("#forecastAdvice").textContent = forecastAdvice[highestLevel.key];
-    $("#forecastSummary").textContent = `${rows.length}개 시간대 · 막대 길이는 체감온도 기준`;
+    $("#forecastSummary").textContent = `${rows.length}개 시간대 · 체감온도 기준`;
 
     const now = new Date();
     forecast.innerHTML = rows.map((item) => {
