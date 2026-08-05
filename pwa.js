@@ -1,4 +1,5 @@
 (() => {
+  // dataRiskLevel: 시간별 전망과 요약 카드의 단계색을 동일한 기준으로 동기화한다.
   const palette = {
     normal: { color: "#23824f", dark: "#0f5d36", soft: "#e2f3e8" },
     caution: { color: "#b97800", dark: "#6b4500", soft: "#fff0a8" },
