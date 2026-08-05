@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">폭염 안전 가이드</title>
+  <desc id="desc">코레일 블루 바탕 위에 태양과 철도 선로를 표현한 아이콘</desc>
+  <rect width="512" height="512" rx="104" fill="#073b66"/>
+  <rect x="42" y="42" width="428" height="428" rx="86" fill="#004f8f"/>
+  <g fill="none" stroke="#ffd24a" stroke-width="14" stroke-linecap="round">
+    <path d="M358 82v28M358 218v28M290 150h-28M454 150h-28M310 102l-20-20M426 218l-20-20M406 102l20-20M290 218l20-20"/>
+  </g>
+  <circle cx="358" cy="150" r="48" fill="#ffd24a"/>
+  <g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M150 420 222 178M362 420 290 178" stroke-width="24"/>
+    <path d="M134 374h244M146 322h220M158 272h196M174 226h164" stroke-width="14"/>
+  </g>
+</svg>
