@@ -37,8 +37,27 @@ if station_count != 1:
 # 정시 예보 기준 근무시간과 최신 정적 파일 버전을 유지한다.
 index = index.replace("18:10~익일 09:00", "18:00~익일 08:00")
 index = re.sub(r'href="styles\.css(?:\?v=[^"]+)?"', 'href="styles.css?v=20260805-0900"', index, count=1)
-index = re.sub(r'href="refresh\.css(?:\?v=[^"]+)?"', 'href="refresh.css?v=20260805-0905"', index, count=1)
+index = re.sub(r'href="refresh\.css(?:\?v=[^"]+)?"', 'href="refresh.css?v=20260805-0910"', index, count=1)
 index = re.sub(r'src="app\.js(?:\?v=[^"]+)?"', 'src="app.js?v=20260805-0900"', index, count=1)
+
+# 주요 섹션 제목은 한 문장으로 정리하고 동일한 제목 위계를 사용한다.
+index, contacts_count = re.subn(
+    r'<p class="section-kicker">순천관리역 비상연락망</p>\s*<h2 id="contacts-title">원터치 연락</h2>',
+    '<h2 id="contacts-title">비상연락망</h2>',
+    index,
+    count=1,
+)
+if contacts_count == 0 and '<h2 id="contacts-title">비상연락망</h2>' not in index:
+    raise SystemExit("비상연락망 제목을 찾지 못했습니다.")
+
+index, standards_count = re.subn(
+    r'<p class="section-kicker">2026 공식 기준</p>\s*<h2 id="standards-title">단계별 기준</h2>',
+    '<h2 id="standards-title">2026년 폭염 단계별 기준</h2>',
+    index,
+    count=1,
+)
+if standards_count == 0 and '<h2 id="standards-title">2026년 폭염 단계별 기준</h2>' not in index:
+    raise SystemExit("폭염 단계별 기준 제목을 찾지 못했습니다.")
 
 # 공통 안전정보는 오늘 컨디션 확인만 기본 펼침으로 시작한다.
 index = index.replace('<details class="info-block" open>', '<details class="info-block">')
@@ -68,8 +87,13 @@ required_markers = {
         'data-station="boseong"',
         '18:00~익일 08:00',
         'styles.css?v=20260805-0900',
-        'refresh.css?v=20260805-0905',
+        'refresh.css?v=20260805-0910',
         'app.js?v=20260805-0900',
+        '<h2 id="forecast-title">오늘의 체감온도</h2>',
+        '<h2 id="action-title">현장 업무 지침</h2>',
+        '<h2 id="health-title">공통 안전정보</h2>',
+        '<h2 id="contacts-title">비상연락망</h2>',
+        '<h2 id="standards-title">2026년 폭염 단계별 기준</h2>',
         '<details class="info-block" open>',
         'id="conditionResult" aria-live="polite" hidden',
     ),
@@ -90,7 +114,7 @@ required_markers = {
         '/* precision-density-patch:end */',
     ),
     "refresh.css": (
-        '@import url("typography-fix.css?v=20260805-0905")',
+        '@import url("typography-fix.css?v=20260805-0910")',
         '.hero__refresh',
     ),
     "typography-fix.css": (
@@ -98,6 +122,9 @@ required_markers = {
         'line-break: strict',
         '.support-panel li',
         '.details-content li',
+        '#forecast-title',
+        '#contacts-title',
+        '#standards-title',
     ),
 }
 
@@ -116,4 +143,4 @@ for filename, markers in required_markers.items():
         raise SystemExit(f"{filename} UI 구조 검증 실패: " + ", ".join(missing))
 
 index_path.write_text(index, encoding="utf-8")
-print("최신 모바일 UI 구조와 한글 줄바꿈, 기상 갱신 호환성을 확인했습니다.")
+print("주요 섹션 제목과 최신 모바일 UI, 기상 갱신 호환성을 확인했습니다.")
