@@ -1,0 +1,601 @@
+/*
+ * KORAIL Safety Design System
+ * 모든 시각적 색상은 design-tokens.css의 Brand/Safe/Caution/Warning/Danger만 사용한다.
+ */
+
+html {
+  background: var(--ds-canvas);
+}
+
+body {
+  background: var(--ds-canvas);
+  color: var(--ds-text);
+}
+
+:focus-visible {
+  outline-color: var(--ds-focus);
+}
+
+.skip-link,
+.station-section,
+.surface,
+.install-dialog {
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-card-radius);
+  background: var(--ds-surface);
+  box-shadow: var(--ds-shadow);
+}
+
+.station-section,
+.surface {
+  padding: var(--ds-card-padding);
+}
+
+.page-header h1,
+.section-inline-heading h2,
+.section-heading h2,
+.hourly-block__title h3,
+.field-panel__heading h3,
+.guide-header strong,
+.info-block summary,
+.contact-link strong,
+.standard-row span,
+.install-dialog h2 {
+  color: var(--ds-text-strong);
+}
+
+.brand-label,
+.section-kicker,
+.guide-context,
+.contact-link span,
+footer a,
+.info-block summary::after {
+  color: var(--brand-solid);
+}
+
+.section-inline-heading p,
+.section-description,
+.setting-label,
+.field-panel__heading p,
+.microcopy,
+.check-intro,
+.condition-result p,
+.hourly-block__title span,
+footer {
+  color: var(--ds-text-muted);
+}
+
+.weather-link {
+  border-color: var(--brand-border);
+  color: var(--brand-accent);
+}
+
+/* Controls */
+.station-grid button,
+.segmented,
+.page-action-button,
+.hero__refresh,
+.input-wrap,
+.primary-button,
+.call-button,
+.install-dialog__close {
+  border-radius: var(--ds-control-radius);
+}
+
+.station-grid button,
+.segmented,
+.action-settings,
+.field-panel,
+.support-panel,
+.empty-state {
+  background: var(--brand-surface);
+  color: var(--brand-text);
+}
+
+.station-grid button,
+.segmented button,
+.page-action-button,
+.hero__refresh,
+.primary-button,
+.call-button,
+.install-dialog__close {
+  box-shadow: none;
+}
+
+.station-grid button {
+  border: var(--ds-border-width) solid var(--brand-border);
+  color: var(--brand-text);
+}
+
+.station-grid button[aria-pressed="true"],
+.segmented button[aria-pressed="true"],
+.segmented--soft button[aria-pressed="true"],
+.primary-button,
+.install-dialog__close {
+  border-color: var(--brand-solid);
+  background: var(--brand-solid);
+  color: var(--ds-surface);
+}
+
+.segmented {
+  border: var(--ds-border-width) solid var(--brand-border);
+  padding: var(--ds-space-1);
+}
+
+.segmented button {
+  border: var(--ds-border-width) solid transparent;
+  color: var(--brand-text);
+}
+
+.page-action-button {
+  border: var(--ds-border-width) solid var(--brand-border);
+  background: var(--ds-surface);
+  color: var(--brand-accent);
+  box-shadow: var(--ds-shadow);
+}
+
+.page-action-button:hover,
+.page-action-button:active {
+  background: var(--brand-surface);
+}
+
+.input-wrap {
+  border: var(--ds-border-width) solid var(--brand-border);
+  background: var(--ds-surface);
+  box-shadow: none;
+}
+
+.input-wrap:focus-within {
+  border-color: var(--brand-solid);
+  box-shadow: none;
+  outline: 2px solid var(--brand-border);
+  outline-offset: 1px;
+}
+
+.input-wrap input {
+  color: var(--brand-accent);
+}
+
+.input-wrap span {
+  color: var(--brand-text);
+}
+
+/* Card system */
+.hero,
+.forecast-highlight,
+.action-settings,
+.field-panel,
+.support-panel,
+.emergency-banner,
+.condition-result {
+  border-width: var(--ds-border-width);
+  border-style: solid;
+  border-radius: var(--ds-card-radius);
+}
+
+.action-settings,
+.field-panel,
+.support-panel {
+  border-color: var(--brand-border);
+  padding: var(--ds-card-padding);
+  background: var(--ds-surface);
+}
+
+/* Current status hero: state card */
+.hero {
+  --hero-surface: var(--brand-surface);
+  --hero-border: var(--brand-border);
+  --hero-text: var(--brand-text);
+  --hero-solid: var(--brand-solid);
+  --hero-accent: var(--brand-accent);
+  overflow: visible;
+  padding: var(--ds-card-padding);
+  border-color: var(--hero-border);
+  background: var(--hero-surface);
+  color: var(--hero-text);
+  box-shadow: var(--ds-shadow);
+}
+
+.hero::after {
+  display: none;
+}
+
+.hero__source,
+.hero__eyebrow,
+.hero__action-label,
+.hero__updated,
+.hero__meta span {
+  color: var(--hero-text);
+}
+
+.status-dot {
+  background: var(--hero-solid);
+  box-shadow: none;
+}
+
+.hero__temperature {
+  color: var(--hero-accent);
+}
+
+.hero__level-icon {
+  background: var(--hero-solid);
+  color: var(--ds-surface);
+}
+
+.hero__level strong,
+.hero__action p:last-child {
+  color: var(--hero-accent);
+}
+
+.hero__action {
+  border-color: var(--hero-border);
+}
+
+.hero__meta span {
+  border: var(--ds-border-width) solid var(--hero-border);
+  background: var(--ds-surface);
+}
+
+.hero__refresh {
+  border: var(--ds-border-width) solid var(--hero-border);
+  background: var(--ds-surface);
+  color: var(--hero-accent);
+}
+
+.hero__refresh:hover,
+.hero__refresh:active {
+  background: var(--hero-surface);
+}
+
+.hero[data-risk-level="safe"] {
+  --hero-surface: var(--safe-surface);
+  --hero-border: var(--safe-border);
+  --hero-text: var(--safe-text);
+  --hero-solid: var(--safe-solid);
+  --hero-accent: var(--safe-accent);
+}
+
+.hero[data-risk-level="caution"] {
+  --hero-surface: var(--caution-surface);
+  --hero-border: var(--caution-border);
+  --hero-text: var(--caution-text);
+  --hero-solid: var(--caution-solid);
+  --hero-accent: var(--caution-accent);
+}
+
+.hero[data-risk-level="warning"] {
+  --hero-surface: var(--warning-surface);
+  --hero-border: var(--warning-border);
+  --hero-text: var(--warning-text);
+  --hero-solid: var(--warning-solid);
+  --hero-accent: var(--warning-accent);
+}
+
+.hero[data-risk-level="danger"] {
+  --hero-surface: var(--danger-surface);
+  --hero-border: var(--danger-border);
+  --hero-text: var(--danger-text);
+  --hero-solid: var(--danger-solid);
+  --hero-accent: var(--danger-accent);
+}
+
+/* Forecast summary state card */
+.forecast-highlight {
+  --forecast-surface: var(--brand-surface);
+  --forecast-border: var(--brand-border);
+  --forecast-text: var(--brand-text);
+  --forecast-solid: var(--brand-solid);
+  --forecast-accent: var(--brand-accent);
+  padding: var(--ds-card-padding);
+  border-color: var(--forecast-border);
+  background: var(--forecast-surface);
+  color: var(--forecast-text);
+  box-shadow: none;
+}
+
+.forecast-highlight[data-risk-level="normal"],
+.forecast-highlight[data-risk-level="interest"] {
+  --forecast-surface: var(--safe-surface);
+  --forecast-border: var(--safe-border);
+  --forecast-text: var(--safe-text);
+  --forecast-solid: var(--safe-solid);
+  --forecast-accent: var(--safe-accent);
+  --forecast-color: var(--safe-solid) !important;
+  --forecast-dark: var(--safe-accent) !important;
+  --forecast-soft: var(--safe-surface) !important;
+}
+
+.forecast-highlight[data-risk-level="caution"] {
+  --forecast-surface: var(--caution-surface);
+  --forecast-border: var(--caution-border);
+  --forecast-text: var(--caution-text);
+  --forecast-solid: var(--caution-solid);
+  --forecast-accent: var(--caution-accent);
+  --forecast-color: var(--caution-solid) !important;
+  --forecast-dark: var(--caution-accent) !important;
+  --forecast-soft: var(--caution-surface) !important;
+}
+
+.forecast-highlight[data-risk-level="warning"] {
+  --forecast-surface: var(--warning-surface);
+  --forecast-border: var(--warning-border);
+  --forecast-text: var(--warning-text);
+  --forecast-solid: var(--warning-solid);
+  --forecast-accent: var(--warning-accent);
+  --forecast-color: var(--warning-solid) !important;
+  --forecast-dark: var(--warning-accent) !important;
+  --forecast-soft: var(--warning-surface) !important;
+}
+
+.forecast-highlight[data-risk-level="danger"] {
+  --forecast-surface: var(--danger-surface);
+  --forecast-border: var(--danger-border);
+  --forecast-text: var(--danger-text);
+  --forecast-solid: var(--danger-solid);
+  --forecast-accent: var(--danger-accent);
+  --forecast-color: var(--danger-solid) !important;
+  --forecast-dark: var(--danger-accent) !important;
+  --forecast-soft: var(--danger-surface) !important;
+}
+
+.forecast-highlight__head > span,
+.forecast-facts dt,
+.forecast-facts dd,
+.forecast-advice {
+  color: var(--forecast-text);
+}
+
+.forecast-highlight__head strong {
+  color: var(--forecast-accent);
+}
+
+.forecast-level-badge {
+  background: var(--forecast-solid);
+  color: var(--ds-surface);
+}
+
+.forecast-facts {
+  border-color: var(--forecast-border);
+}
+
+.forecast-advice {
+  border: var(--ds-border-width) solid var(--forecast-border);
+  background: transparent;
+}
+
+/* Hourly data visualization */
+.forecast-grid {
+  border-color: var(--brand-border) !important;
+}
+
+.forecast-item.forecast-item--bar {
+  border-color: var(--brand-border) !important;
+  background: var(--ds-surface) !important;
+}
+
+.forecast-item.forecast-item--bar[data-current="true"] {
+  background: var(--brand-surface) !important;
+}
+
+.forecast-item[data-risk-level="normal"],
+.forecast-item[data-risk-level="interest"] {
+  --item-risk: var(--safe-solid) !important;
+  --item-risk-dark: var(--safe-accent) !important;
+  --item-risk-soft: var(--safe-surface) !important;
+  --label-bg: var(--safe-solid) !important;
+  --label-text: var(--ds-surface) !important;
+  --stage-text: var(--safe-accent) !important;
+}
+
+.forecast-item[data-risk-level="caution"] {
+  --item-risk: var(--caution-solid) !important;
+  --item-risk-dark: var(--caution-accent) !important;
+  --item-risk-soft: var(--caution-surface) !important;
+  --label-bg: var(--caution-solid) !important;
+  --label-text: var(--ds-surface) !important;
+  --stage-text: var(--caution-accent) !important;
+}
+
+.forecast-item[data-risk-level="warning"] {
+  --item-risk: var(--warning-solid) !important;
+  --item-risk-dark: var(--warning-accent) !important;
+  --item-risk-soft: var(--warning-surface) !important;
+  --label-bg: var(--warning-solid) !important;
+  --label-text: var(--ds-surface) !important;
+  --stage-text: var(--warning-accent) !important;
+}
+
+.forecast-item[data-risk-level="danger"] {
+  --item-risk: var(--danger-solid) !important;
+  --item-risk-dark: var(--danger-accent) !important;
+  --item-risk-soft: var(--danger-surface) !important;
+  --label-bg: var(--danger-solid) !important;
+  --label-text: var(--ds-surface) !important;
+  --stage-text: var(--danger-accent) !important;
+}
+
+.forecast-item--bar .forecast-time {
+  color: var(--brand-accent) !important;
+}
+
+.forecast-bar-scale::before {
+  background: var(--brand-border) !important;
+}
+
+.forecast-bar-fill,
+.forecast-item--bar[data-peak="true"] .forecast-bar-fill {
+  background: var(--brand-text) !important;
+}
+
+.forecast-temp-label {
+  background: var(--label-bg) !important;
+  color: var(--label-text) !important;
+  box-shadow: none !important;
+}
+
+.forecast-stage-label {
+  color: var(--stage-text) !important;
+}
+
+.forecast-peak-badge {
+  border-color: var(--brand-border);
+  background: var(--brand-surface);
+  color: var(--brand-accent);
+}
+
+.forecast-item--bar[data-peak="true"] .forecast-temp-label {
+  box-shadow: none !important;
+  outline: 2px solid var(--item-risk-soft);
+  outline-offset: 1px;
+}
+
+/* Field input and work guidance */
+.field-result-row {
+  border-color: var(--brand-border);
+}
+
+.field-input-error,
+.input-wrap input[aria-invalid="true"] {
+  color: var(--danger-text);
+}
+
+.input-wrap:has(input[aria-invalid="true"]) {
+  border-color: var(--danger-border);
+  background: var(--danger-surface);
+}
+
+.guide-header {
+  border-color: var(--brand-border);
+}
+
+.guide-level-dot {
+  background: var(--risk);
+  box-shadow: none;
+}
+
+.guide-summary {
+  border: var(--ds-border-width) solid var(--risk-border, var(--safe-border));
+  background: var(--risk-soft);
+  color: var(--risk-dark);
+}
+
+.guide-item {
+  border-color: var(--brand-border);
+}
+
+.guide-number {
+  background: var(--risk);
+  color: var(--ds-surface);
+}
+
+.guide-text {
+  color: var(--brand-accent);
+}
+
+/* Safety information */
+.emergency-banner {
+  padding: var(--ds-card-padding);
+  border-color: var(--danger-border);
+  background: var(--danger-surface);
+  color: var(--danger-text);
+}
+
+.emergency-banner strong,
+.subhead--danger,
+.contact-link--emergency strong,
+.contact-link--emergency span {
+  color: var(--danger-accent);
+}
+
+.info-list,
+.info-block,
+.condition-row,
+.contact-link,
+.standard-row {
+  border-color: var(--brand-border);
+}
+
+.info-block {
+  background: var(--ds-surface);
+}
+
+.condition-row input {
+  accent-color: var(--brand-solid);
+}
+
+.condition-result {
+  padding: var(--ds-card-padding);
+  border-color: var(--brand-border);
+  background: var(--brand-surface);
+}
+
+.condition-result[data-severity="caution"] {
+  border-color: var(--caution-border);
+  background: var(--caution-surface);
+}
+
+.condition-result[data-severity="warning"] {
+  border-color: var(--warning-border);
+  background: var(--warning-surface);
+}
+
+.condition-result[data-severity="critical"] {
+  border-color: var(--danger-border);
+  background: var(--danger-surface);
+}
+
+.condition-result[data-severity="caution"] strong { color: var(--caution-accent); }
+.condition-result[data-severity="warning"] strong { color: var(--warning-accent); }
+.condition-result[data-severity="critical"] strong { color: var(--danger-accent); }
+
+.call-button {
+  border: var(--ds-border-width) solid var(--danger-solid);
+  background: var(--danger-solid);
+  color: var(--ds-surface);
+}
+
+/* Response standards: color is limited to thresholds and labels */
+.standard-row--interest { --standard-color: var(--safe-accent); }
+.standard-row--caution { --standard-color: var(--caution-accent); }
+.standard-row--warning { --standard-color: var(--warning-accent); }
+.standard-row--danger { --standard-color: var(--danger-accent); }
+
+.standard-row b,
+.standard-row strong {
+  color: var(--standard-color);
+}
+
+.standards-note {
+  border: var(--ds-border-width) solid var(--brand-border);
+  background: var(--brand-surface);
+  color: var(--brand-text);
+}
+
+/* Dialog */
+.install-dialog {
+  color: var(--brand-text);
+}
+
+.install-dialog::backdrop {
+  background: var(--brand-accent);
+  opacity: 0.48;
+}
+
+.install-dialog p,
+.install-dialog li {
+  color: var(--brand-text);
+}
+
+@media (max-width: 420px) {
+  .station-section,
+  .surface,
+  .hero,
+  .forecast-highlight,
+  .action-settings,
+  .field-panel,
+  .support-panel,
+  .emergency-banner,
+  .condition-result {
+    padding: var(--ds-space-4);
+  }
+}
