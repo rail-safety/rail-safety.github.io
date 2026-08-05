@@ -22,68 +22,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Update assets and automatic field input markup
+      - name: Update forecast asset versions
         shell: bash
         run: |
           VERSION="${GITHUB_SHA::12}"
-          export VERSION
-          python - <<'PY'
-          from pathlib import Path
-          import os
-          import re
+          sed -i -E "s#forecast-bars\.css\?v=[^\"]+#forecast-bars.css?v=${VERSION}#" index.html
+          sed -i -E "s#forecast-bars\.js\?v=[^\"]+#forecast-bars.js?v=${VERSION}#" index.html
 
-          path = Path("index.html")
-          html = path.read_text(encoding="utf-8")
-          version = os.environ["VERSION"]
-
-          html = re.sub(
-              r'forecast-bars\.css\?v=[^"\s]+',
-              f'forecast-bars.css?v={version}',
-              html,
-          )
-          html = re.sub(
-              r'forecast-bars\.js\?v=[^"\s]+',
-              f'forecast-bars.js?v={version}',
-              html,
-          )
-
-          field_markup = '''<div class="field-result-row">
-          <div>
-            <span>계산 결과</span>
-            <strong id="fieldResult" aria-live="polite">값을 입력하세요</strong>
-            <span class="field-auto-status" id="fieldAutoStatus" aria-live="polite">온도·습도 입력 시 자동 적용</span>
-          </div>
-        </div>
-        <p class="field-input-error" id="fieldInputError" role="status" aria-live="polite" hidden></p>'''
-
-          html, count = re.subn(
-              r'<div class="field-result-row">\s*<div><span>계산 결과</span><strong id="fieldResult" aria-live="polite">.*?</strong></div>\s*<button class="primary-button" id="useField" type="button"(?: disabled)?>.*?</button>\s*</div>(?:\s*<p class="field-input-error"[^>]*>.*?</p>)?',
-              field_markup,
-              html,
-              count=1,
-              flags=re.S,
-          )
-
-          if count == 0 and 'id="fieldAutoStatus"' not in html:
-              raise SystemExit("현장 입력 결과 영역을 찾지 못했습니다.")
-
-          html = html.replace(
-              'aria-describedby="fieldHelp"',
-              'aria-describedby="fieldHelp fieldInputError"',
-          )
-          path.write_text(html, encoding="utf-8")
-          PY
-
-      - name: Commit updated static files
+      - name: Commit updated versions
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
           if git diff --cached --quiet; then
-            echo "Static files are already current"
+            echo "Forecast asset versions are already current"
           else
-            git commit -m "현장 입력 자동 적용 마크업 및 캐시 갱신"
+            git commit -m "시간별 전망 정적 파일 캐시 갱신"
             git pull --rebase origin main
             git push
           fi
