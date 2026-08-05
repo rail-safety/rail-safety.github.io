@@ -8,7 +8,7 @@ on:
       - 'scripts/fetch_kma.py'
   workflow_dispatch:
   schedule:
-    - cron: '12,22,32,42,52 * * * *'
+    - cron: '*/5 * * * *'
 
 permissions:
   contents: write
@@ -22,8 +22,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout repository
+      - name: Checkout latest main
         uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -39,18 +42,18 @@ jobs:
             exit 1
           fi
 
-      - name: Fetch KMA current observations and forecast
+      - name: Fetch latest KMA observations
         env:
           KMA_SERVICE_KEY: ${{ secrets.KMA_SERVICE_KEY }}
         run: python scripts/fetch_kma.py
 
-      - name: Commit updated weather data
+      - name: Commit only when weather data changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add weather.json
           if git diff --cached --quiet; then
-            echo "No weather changes to commit"
+            echo "No new KMA observation or forecast"
           else
             git commit -m "기상청 실황·예보 자동 갱신"
             git pull --rebase origin main
