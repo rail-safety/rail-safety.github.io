@@ -143,7 +143,7 @@ required = {
     "index.html": ("pwa.css?v=20260805-1305", "app.js?v=20260805-1305", "pwa.js?v=20260805-1305", "관심 수준", "주의 수준", "경고 수준", "위험 수준"),
     "app.js": ('key: "interest"', 'name: "관심 수준"', 'name: "위험 수준"', "매 2시간 이내 20분 이상", "매시간 15분", "긴급조치 외 옥외작업 중지"),
     "pwa.css": ('[data-risk-level="interest"]', '.standard-row--interest', '.standard-row--danger'),
-    "pwa.js": ('key: "interest"', 'name: "관심 수준"', 'name: "위험 수준"', "officialCriteriaNote", "lockHeroToAutomaticWeather"),
+    "pwa.js": ("dataRiskLevel", "const palette", "applyRiskTheme", "initQuickActions"),
     "refresh.css": ('.hero__refresh',),
     "typography-fix.css": ('word-break: keep-all',),
     "manifest.webmanifest": ('"display": "standalone"',),
