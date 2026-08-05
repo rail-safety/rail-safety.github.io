@@ -1,0 +1,26 @@
+{
+  "name": "순천관리역 폭염 안전 가이드",
+  "short_name": "폭염 안전",
+  "description": "철도역 현장직원용 폭염 안전 가이드",
+  "lang": "ko-KR",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f2f5f7",
+  "theme_color": "#073b66",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
