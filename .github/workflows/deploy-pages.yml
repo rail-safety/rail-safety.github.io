@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -21,8 +21,10 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout latest main
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
@@ -32,8 +34,8 @@ jobs:
         with:
           path: .
 
-      - name: Deploy to GitHub Pages
+      - name: Deploy latest site to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
 
-# Pages 설정 활성화 후 배포 재실행: 2026-08-05 12:49 KST
+# 오래된 대기 배포를 취소하고 항상 최신 main만 게시
