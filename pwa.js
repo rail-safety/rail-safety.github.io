@@ -1,11 +1,19 @@
 (() => {
   // dataRiskLevel: 시간별 전망과 요약 카드의 단계색을 동일한 기준으로 동기화한다.
   const palette = {
-    normal: { color: "#23824f", dark: "#0f5d36", soft: "#e2f3e8" },
-    caution: { color: "#b97800", dark: "#6b4500", soft: "#fff0a8" },
-    warning: { color: "#e56500", dark: "#883600", soft: "#ffd3a3" },
-    danger: { color: "#d92d20", dark: "#8c1d17", soft: "#f8c0bc" },
-    extreme: { color: "#8e1b1b", dark: "#571010", soft: "#eaa5a5" }
+    normal: { color: "#567b68", dark: "#355444", soft: "#e4ece7" },
+    caution: { color: "#a47a31", dark: "#674a18", soft: "#f1e6cb" },
+    warning: { color: "#b9653f", dark: "#743a24", soft: "#efd6c8" },
+    danger: { color: "#a94743", dark: "#6d2b29", soft: "#eac9c7" },
+    extreme: { color: "#762f3b", dark: "#481c24", soft: "#dcbec4" }
+  };
+
+  const syncApplicationPalette = () => {
+    if (typeof levels === "undefined" || !Array.isArray(levels)) return;
+    levels.forEach((level) => {
+      const colors = palette[level.key];
+      if (colors) Object.assign(level, colors);
+    });
   };
 
   const getRiskKey = (label = "") => {
@@ -105,6 +113,7 @@
   };
 
   const init = () => {
+    syncApplicationPalette();
     lockHeroToAutomaticWeather();
     applyRiskTheme();
     const observer = new MutationObserver(applyRiskTheme);
