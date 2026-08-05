@@ -35,3 +35,5 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+# Pages 설정 활성화 후 배포 재실행: 2026-08-05 12:49 KST
