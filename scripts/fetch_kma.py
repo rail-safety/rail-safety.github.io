@@ -69,8 +69,8 @@ def choose_forecast_base(now: datetime) -> tuple[str, str]:
 
 
 def current_base_candidates(now: datetime, attempts: int = 4) -> list[tuple[str, str]]:
-    """최신 실황의 배포 지연을 고려해 최근 정시부터 과거 순으로 후보를 만든다."""
-    anchor = (now - timedelta(minutes=40)).replace(minute=0, second=0, microsecond=0)
+    """현재 정시를 먼저 조회하고, 미제공 시 직전 정시들로 순차 재시도한다."""
+    anchor = now.replace(minute=0, second=0, microsecond=0)
     return [
         ((anchor - timedelta(hours=offset)).strftime("%Y%m%d"),
          (anchor - timedelta(hours=offset)).strftime("%H00"))
@@ -89,7 +89,7 @@ def request_items(url: str, service_key: str, base_date: str, base_time: str, nx
         "nx": str(nx),
         "ny": str(ny),
     }
-    req = urllib.request.Request(url + "?" + urllib.parse.urlencode(params), headers={"User-Agent": "suncheon-heat-safety/1.2"})
+    req = urllib.request.Request(url + "?" + urllib.parse.urlencode(params), headers={"User-Agent": "suncheon-heat-safety/1.3"})
     with urllib.request.urlopen(req, timeout=30) as response:
         payload = json.load(response)
     header = payload.get("response", {}).get("header", {})
@@ -125,7 +125,7 @@ def fetch_latest_current(service_key: str, now: datetime, nx: int, ny: int) -> t
             items = request_items(CURRENT_URL, service_key, base_date, base_time, nx, ny, 100)
             current = build_current(items, base_date, base_time)
             return current, base_date, base_time
-        except Exception as exc:  # 최근 자료가 아직 없으면 직전 시각으로 재시도
+        except Exception as exc:
             errors.append(f"{base_date} {base_time}: {exc}")
     raise RuntimeError("최근 초단기실황 조회 실패: " + " | ".join(errors))
 
