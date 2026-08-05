@@ -37,67 +37,68 @@
   min-width: 1px;
 }
 
-/* 단계색은 세이지-오커-테라코타-브릭-버건디의 톤다운 색축을 사용한다. */
+/* 시간별 행은 파스텔이 아닌 중간 명도의 스모키 안전 팔레트를 사용한다. */
 .forecast-item[data-risk-level="normal"] {
-  --item-risk: #567b68 !important;
-  --item-risk-dark: #355444 !important;
-  --item-risk-soft: #e4ece7 !important;
+  --item-risk: #4f6f5e !important;
+  --item-risk-dark: #30483b !important;
+  --item-risk-soft: #cbd8d0 !important;
 }
 .forecast-item[data-risk-level="caution"] {
-  --item-risk: #a47a31 !important;
-  --item-risk-dark: #674a18 !important;
-  --item-risk-soft: #f1e6cb !important;
+  --item-risk: #956b24 !important;
+  --item-risk-dark: #5e4216 !important;
+  --item-risk-soft: #dec787 !important;
 }
 .forecast-item[data-risk-level="warning"] {
-  --item-risk: #b9653f !important;
-  --item-risk-dark: #743a24 !important;
-  --item-risk-soft: #efd6c8 !important;
+  --item-risk: #a65332 !important;
+  --item-risk-dark: #66321e !important;
+  --item-risk-soft: #d89b72 !important;
 }
 .forecast-item[data-risk-level="danger"] {
-  --item-risk: #a94743 !important;
-  --item-risk-dark: #6d2b29 !important;
-  --item-risk-soft: #eac9c7 !important;
+  --item-risk: #913d3a !important;
+  --item-risk-dark: #5c2725 !important;
+  --item-risk-soft: #c97973 !important;
 }
 .forecast-item[data-risk-level="extreme"] {
-  --item-risk: #762f3b !important;
-  --item-risk-dark: #481c24 !important;
-  --item-risk-soft: #dcbec4 !important;
+  --item-risk: #662633 !important;
+  --item-risk-dark: #401820 !important;
+  --item-risk-soft: #c17b86 !important;
 }
 .forecast-item {
   background: var(--item-risk-soft) !important;
 }
 .forecast-item[data-peak="true"] {
-  background: color-mix(in srgb, var(--item-risk) 18%, var(--item-risk-soft)) !important;
+  background: color-mix(in srgb, var(--item-risk) 10%, var(--item-risk-soft)) !important;
 }
 .forecast-time,
 .forecast-temp {
   color: var(--text-strong) !important;
 }
 
+/* 큰 전망 카드는 같은 색축을 쓰되 행보다 한 단계 부드럽게 유지한다. */
 .forecast-highlight[data-risk-level="normal"] {
-  --forecast-color: #567b68 !important;
-  --forecast-dark: #355444 !important;
-  --forecast-soft: #e4ece7 !important;
+  --forecast-color: #4f6f5e !important;
+  --forecast-dark: #30483b !important;
+  --forecast-soft: #dee6e1 !important;
 }
 .forecast-highlight[data-risk-level="caution"] {
-  --forecast-color: #a47a31 !important;
-  --forecast-dark: #674a18 !important;
-  --forecast-soft: #f1e6cb !important;
+  --forecast-color: #956b24 !important;
+  --forecast-dark: #5e4216 !important;
+  --forecast-soft: #e8d9b2 !important;
 }
 .forecast-highlight[data-risk-level="warning"] {
-  --forecast-color: #b9653f !important;
-  --forecast-dark: #743a24 !important;
-  --forecast-soft: #efd6c8 !important;
+  --forecast-color: #a65332 !important;
+  --forecast-dark: #66321e !important;
+  --forecast-soft: #e4bfa9 !important;
 }
 .forecast-highlight[data-risk-level="danger"] {
-  --forecast-color: #a94743 !important;
-  --forecast-dark: #6d2b29 !important;
-  --forecast-soft: #eac9c7 !important;
+  --forecast-color: #913d3a !important;
+  --forecast-dark: #5c2725 !important;
+  --forecast-soft: #dca9a6 !important;
 }
 .forecast-highlight[data-risk-level="extreme"] {
-  --forecast-color: #762f3b !important;
-  --forecast-dark: #481c24 !important;
-  --forecast-soft: #dcbec4 !important;
+  --forecast-color: #662633 !important;
+  --forecast-dark: #401820 !important;
+  --forecast-soft: #d3a0aa !important;
 }
 
 .install-dialog {
