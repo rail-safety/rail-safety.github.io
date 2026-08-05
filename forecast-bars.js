@@ -8,6 +8,8 @@
     return clamp(ratio * 100, 8, 100);
   };
 
+  const getStageLabel = (level) => level.name.replace(/\s*수준$/, "");
+
   if (typeof getForecastRows !== "function" || typeof getLevel !== "function") return;
 
   renderForecast = function renderForecastBars() {
@@ -54,6 +56,7 @@
       const current = date.getHours() === now.getHours() && date.toDateString() === now.toDateString();
       const peak = item.time === highest.time;
       const timeLabel = formatForecastHour(date);
+      const stageLabel = getStageLabel(level);
       const barPercent = getBarPercent(item.hi).toFixed(1);
 
       return `<article class="forecast-item forecast-item--bar" data-risk-level="${level.key}" data-current="${current}" data-peak="${peak}" style="--item-risk:${level.color};--item-risk-dark:${level.dark};--item-risk-soft:${level.soft}" aria-label="${timeLabel}, 체감온도 ${item.hi.toFixed(1)}도, ${level.name}${peak ? ", 최고 시간대" : ""}">
@@ -61,12 +64,14 @@
           <time class="forecast-time" datetime="${item.time}">${timeLabel}</time>
           ${peak ? '<span class="forecast-peak-badge">최고</span>' : ''}
         </div>
-        <span class="forecast-risk-dot" aria-hidden="true"></span>
         <div class="forecast-measure">
-          <span class="forecast-level sr-only">${level.name}</span>
           <div class="forecast-bar-scale" style="--bar-width:${barPercent}%">
             <span class="forecast-bar-fill" aria-hidden="true"></span>
-            <span class="forecast-temp-label">${item.hi.toFixed(1)}℃</span>
+            <span class="forecast-value-cluster">
+              <span class="forecast-temp-label">${item.hi.toFixed(1)}℃</span>
+              <span class="forecast-stage-label">${stageLabel}</span>
+            </span>
+            <span class="forecast-level sr-only">${level.name}</span>
           </div>
         </div>
       </article>`;
