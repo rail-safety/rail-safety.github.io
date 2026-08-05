@@ -64,26 +64,26 @@ else:
     if 'apple-mobile-web-app-capable' not in index:
         index = index.replace('  <title>순천관리역 폭염 안전 가이드</title>', '  <title>순천관리역 폭염 안전 가이드</title>\n' + pwa_head, 1)
 
-# 공유·홈 화면 추가 UI와 단계색 보정 스타일을 연결한다.
+# 공유·홈 화면 추가 UI와 중간톤 위험단계 스타일을 연결한다.
 if 'href="pwa.css' not in index:
     index = re.sub(
         r'(  <link rel="stylesheet" href="refresh\.css\?v=[^"]+"\s*/>)',
-        r'\1\n  <link rel="stylesheet" href="pwa.css?v=20260805-0950" />',
+        r'\1\n  <link rel="stylesheet" href="pwa.css?v=20260805-1125" />',
         index,
         count=1,
     )
 else:
-    index = re.sub(r'href="pwa\.css(?:\?v=[^"]+)?"', 'href="pwa.css?v=20260805-0950"', index, count=1)
+    index = re.sub(r'href="pwa\.css(?:\?v=[^"]+)?"', 'href="pwa.css?v=20260805-1125"', index, count=1)
 
 if 'src="pwa.js' not in index:
     index = re.sub(
         r'(  <script src="refresh\.js\?v=[^"]+"></script>)',
-        r'\1\n  <script src="pwa.js?v=20260805-0950"></script>',
+        r'\1\n  <script src="pwa.js?v=20260805-1125"></script>',
         index,
         count=1,
     )
 else:
-    index = re.sub(r'src="pwa\.js(?:\?v=[^"]+)?"', 'src="pwa.js?v=20260805-0950"', index, count=1)
+    index = re.sub(r'src="pwa\.js(?:\?v=[^"]+)?"', 'src="pwa.js?v=20260805-1125"', index, count=1)
 
 # 주요 섹션 제목은 한 문장으로 정리하고 동일한 제목 위계를 사용한다.
 index, contacts_count = re.subn(
@@ -133,10 +133,10 @@ required_markers = {
         '18:00~익일 08:00',
         'styles.css?v=20260805-0900',
         'refresh.css?v=20260805-0910',
-        'pwa.css?v=20260805-0950',
+        'pwa.css?v=20260805-1125',
         'app.js?v=20260805-0900',
         'refresh.js?v=20260805-0850',
-        'pwa.js?v=20260805-0950',
+        'pwa.js?v=20260805-1125',
         'manifest.webmanifest?v=20260805-0950',
         'apple-touch-icon.png',
         '<h2 id="forecast-title">오늘의 체감온도</h2>',
@@ -177,9 +177,10 @@ required_markers = {
     ),
     "pwa.css": (
         '.page-quick-actions',
-        '[data-risk-level="caution"]',
-        '[data-risk-level="warning"]',
-        '[data-risk-level="danger"]',
+        '#dec787',
+        '#d89b72',
+        '#c97973',
+        '#c17b86',
         '.install-dialog',
     ),
     "pwa.js": (
@@ -187,6 +188,8 @@ required_markers = {
         'beforeinstallprompt',
         'serviceWorker.register',
         'dataRiskLevel',
+        'panel: "#e8d9b2"',
+        'lockHeroToAutomaticWeather',
     ),
     "manifest.webmanifest": (
         '"display": "standalone"',
@@ -222,4 +225,4 @@ for icon_path in ("icon-192.png", "icon-512.png", "apple-touch-icon.png", "app-i
         raise SystemExit(f"홈 화면 아이콘 누락: {icon_path}")
 
 index_path.write_text(index, encoding="utf-8")
-print("공유·홈 화면 설치 기능과 단계별 색상, 기존 모바일 UI를 확인했습니다.")
+print("중간톤 위험단계 팔레트와 공유·설치 기능, 기존 모바일 UI를 확인했습니다.")
