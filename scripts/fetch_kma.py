@@ -68,9 +68,14 @@ def choose_forecast_base(now: datetime) -> tuple[str, str]:
     return previous.strftime("%Y%m%d"), "2300"
 
 
-def choose_current_base(now: datetime) -> tuple[str, str]:
-    candidate = (now - timedelta(minutes=15)).replace(minute=0, second=0, microsecond=0)
-    return candidate.strftime("%Y%m%d"), candidate.strftime("%H00")
+def current_base_candidates(now: datetime, attempts: int = 4) -> list[tuple[str, str]]:
+    """최신 실황의 배포 지연을 고려해 최근 정시부터 과거 순으로 후보를 만든다."""
+    anchor = (now - timedelta(minutes=40)).replace(minute=0, second=0, microsecond=0)
+    return [
+        ((anchor - timedelta(hours=offset)).strftime("%Y%m%d"),
+         (anchor - timedelta(hours=offset)).strftime("%H00"))
+        for offset in range(attempts)
+    ]
 
 
 def request_items(url: str, service_key: str, base_date: str, base_time: str, nx: int, ny: int, rows: int) -> list[dict[str, Any]]:
@@ -84,14 +89,14 @@ def request_items(url: str, service_key: str, base_date: str, base_time: str, nx
         "nx": str(nx),
         "ny": str(ny),
     }
-    req = urllib.request.Request(url + "?" + urllib.parse.urlencode(params), headers={"User-Agent": "suncheon-heat-safety/1.1"})
+    req = urllib.request.Request(url + "?" + urllib.parse.urlencode(params), headers={"User-Agent": "suncheon-heat-safety/1.2"})
     with urllib.request.urlopen(req, timeout=30) as response:
         payload = json.load(response)
     header = payload.get("response", {}).get("header", {})
     if header.get("resultCode") != "00":
         raise RuntimeError(f"KMA API error {header.get('resultCode')}: {header.get('resultMsg')}")
     items = payload.get("response", {}).get("body", {}).get("items", {}).get("item", [])
-    if not isinstance(items, list):
+    if not isinstance(items, list) or not items:
         raise RuntimeError("기상청 응답에 항목이 없습니다.")
     return items
 
@@ -111,6 +116,18 @@ def build_current(items: list[dict[str, Any]], base_date: str, base_time: str) -
     t, rh = values["T1H"], values["REH"]
     dt = datetime.strptime(base_date + base_time, "%Y%m%d%H%M").replace(tzinfo=KST)
     return {"time": dt.isoformat(timespec="minutes"), "temp": round(t, 1), "rh": round(rh), "hi": apparent_temperature(t, rh), "source": "초단기실황"}
+
+
+def fetch_latest_current(service_key: str, now: datetime, nx: int, ny: int) -> tuple[dict[str, Any], str, str]:
+    errors: list[str] = []
+    for base_date, base_time in current_base_candidates(now):
+        try:
+            items = request_items(CURRENT_URL, service_key, base_date, base_time, nx, ny, 100)
+            current = build_current(items, base_date, base_time)
+            return current, base_date, base_time
+        except Exception as exc:  # 최근 자료가 아직 없으면 직전 시각으로 재시도
+            errors.append(f"{base_date} {base_time}: {exc}")
+    raise RuntimeError("최근 초단기실황 조회 실패: " + " | ".join(errors))
 
 
 def build_hourly(items: list[dict[str, Any]], now: datetime) -> list[dict[str, Any]]:
@@ -148,13 +165,12 @@ def main() -> int:
 
     now = datetime.now(KST)
     forecast_date, forecast_time = choose_forecast_base(now)
-    current_date, current_time = choose_current_base(now)
     output: dict[str, Any] = {
         "source": {"current": "기상청 초단기실황", "forecast": "기상청 단기예보"},
         "formula": "기상청 여름철 체감온도 산식",
         "generatedAt": now.isoformat(timespec="seconds"),
-        "currentBaseDate": current_date,
-        "currentBaseTime": current_time,
+        "currentBaseDate": None,
+        "currentBaseTime": None,
         "baseDate": forecast_date,
         "baseTime": forecast_time,
         "stations": {},
@@ -162,16 +178,20 @@ def main() -> int:
 
     for key, station in STATIONS.items():
         nx, ny = latlon_to_grid(station["lat"], station["lon"])
-        current_items = request_items(CURRENT_URL, service_key, current_date, current_time, nx, ny, 100)
+        current, current_date, current_time = fetch_latest_current(service_key, now, nx, ny)
         forecast_items = request_items(FORECAST_URL, service_key, forecast_date, forecast_time, nx, ny, 1000)
+        hourly = build_hourly(forecast_items, now)
         output["stations"][key] = {
             "name": station["name"],
             "nx": nx,
             "ny": ny,
-            "current": build_current(current_items, current_date, current_time),
-            "hourly": build_hourly(forecast_items, now),
+            "current": current,
+            "hourly": hourly,
         }
-        print(f"{station['name']}: 초단기실황 + 단기예보 수집 완료")
+        if output["currentBaseDate"] is None:
+            output["currentBaseDate"] = current_date
+            output["currentBaseTime"] = current_time
+        print(f"{station['name']}: {current_date} {current_time} 실황 + {forecast_date} {forecast_time} 단기예보 수집 완료")
 
     Path("weather.json").write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return 0
