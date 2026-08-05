@@ -1,38 +1,38 @@
 :root {
-  /* Brand */
+  /* Brand: 첫 번째 현재 체감온도 카드 포함, 변경 금지 */
   --brand-surface: #E8EFF7;
   --brand-border: #C9DBEE;
   --brand-text: #3E5F87;
   --brand-solid: #004F8F;
   --brand-accent: #073B66;
 
-  /* Safe */
-  --safe-surface: #EEF3E8;
-  --safe-border: #CFDEC7;
-  --safe-text: #556A48;
-  --safe-solid: #43593A;
-  --safe-accent: #31462A;
+  /* Safe: 카키·회색기를 줄인 맑고 안정적인 녹색 */
+  --safe-surface: #E5F2E7;
+  --safe-border: #BBD9C0;
+  --safe-text: #3F754A;
+  --safe-solid: #3F7A4B;
+  --safe-accent: #32683E;
 
-  /* Caution */
-  --caution-surface: #FBF2D8;
-  --caution-border: #E7D7A4;
-  --caution-text: #7E6525;
-  --caution-solid: #6B5318;
-  --caution-accent: #57420F;
+  /* Caution: 겨자·갈색기를 줄인 차분하고 맑은 골드 */
+  --caution-surface: #FFF0C4;
+  --caution-border: #E8CB75;
+  --caution-text: #856300;
+  --caution-solid: #8F6C00;
+  --caution-accent: #765700;
 
-  /* Warning */
-  --warning-surface: #F9ECDF;
-  --warning-border: #E4C9B6;
-  --warning-text: #8E5420;
-  --warning-solid: #784314;
-  --warning-accent: #61320C;
+  /* Warning: 벽돌·갈색기를 줄인 선명하고 차분한 오렌지 */
+  --warning-surface: #FBE4CF;
+  --warning-border: #E7B384;
+  --warning-text: #98501A;
+  --warning-solid: #B95A17;
+  --warning-accent: #98440E;
 
-  /* Danger */
-  --danger-surface: #F5E5E5;
-  --danger-border: #DFC3C3;
-  --danger-text: #823434;
-  --danger-solid: #6D2727;
-  --danger-accent: #581C1C;
+  /* Danger: 적갈색기를 줄인 맑고 차분한 적색 */
+  --danger-surface: #F7DDDD;
+  --danger-border: #E4ACAC;
+  --danger-text: #994040;
+  --danger-solid: #B94A4A;
+  --danger-accent: #9A3737;
 
   /* Semantic foundation */
   --ds-canvas: var(--brand-surface);
@@ -68,7 +68,7 @@
   --hero-meta-surface: rgba(255, 255, 255, 0.10);
   --hero-divider: rgba(255, 255, 255, 0.20);
 
-  /* Legacy aliases: existing components resolve through the new system */
+  /* Legacy aliases: existing components resolve through the design system */
   --brand-950: var(--brand-accent);
   --brand-900: var(--brand-accent);
   --brand-800: var(--brand-solid);
