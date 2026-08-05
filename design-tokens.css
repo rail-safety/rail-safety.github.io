@@ -60,6 +60,14 @@
   --ds-space-6: 24px;
   --ds-space-7: 28px;
 
+  /* Brand hero: 첫 번째 기상 관측 카드는 상태와 무관하게 원형 유지 */
+  --hero-background: var(--brand-accent);
+  --hero-radius: 28px;
+  --hero-text: #FFFFFF;
+  --hero-decoration: rgba(255, 255, 255, 0.05);
+  --hero-meta-surface: rgba(255, 255, 255, 0.10);
+  --hero-divider: rgba(255, 255, 255, 0.20);
+
   /* Legacy aliases: existing components resolve through the new system */
   --brand-950: var(--brand-accent);
   --brand-900: var(--brand-accent);
@@ -80,7 +88,7 @@
   --risk: var(--safe-solid);
   --risk-dark: var(--safe-accent);
   --risk-soft: var(--safe-surface);
-  --radius-hero: var(--ds-card-radius);
+  --radius-hero: var(--hero-radius);
   --radius-card: var(--ds-card-radius);
   --radius-control: var(--ds-control-radius);
   --shadow-soft: var(--ds-shadow);
