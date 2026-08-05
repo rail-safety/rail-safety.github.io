@@ -80,3 +80,137 @@
 
   if (state.hourly.length > 0) renderForecast();
 })();
+
+(() => {
+  const tempInput = document.querySelector("#tempInput");
+  const humidityInput = document.querySelector("#rhInput");
+  const result = document.querySelector("#fieldResult");
+  const resultRow = document.querySelector(".field-result-row");
+  const calculator = document.querySelector(".calculator-grid");
+  const applyButton = document.querySelector("#useField");
+
+  if (!tempInput || !humidityInput || !result || !resultRow || !calculator) return;
+
+  const legacyUpdateField = typeof window.updateField === "function" ? window.updateField : null;
+  if (legacyUpdateField) {
+    tempInput.removeEventListener("input", legacyUpdateField);
+    humidityInput.removeEventListener("input", legacyUpdateField);
+  }
+  applyButton?.remove();
+
+  const resultInfo = resultRow.querySelector("div") || resultRow;
+  let status = document.querySelector("#fieldAutoStatus");
+  if (!status) {
+    status = document.createElement("span");
+    status.id = "fieldAutoStatus";
+    status.className = "field-auto-status";
+    status.setAttribute("aria-live", "polite");
+    status.textContent = "온도·습도 입력 시 자동 적용";
+    resultInfo.append(status);
+  }
+
+  let error = document.querySelector("#fieldInputError");
+  if (!error) {
+    error = document.createElement("p");
+    error.id = "fieldInputError";
+    error.className = "field-input-error";
+    error.setAttribute("role", "status");
+    error.setAttribute("aria-live", "polite");
+    error.hidden = true;
+    calculator.insertAdjacentElement("afterend", error);
+  }
+
+  [tempInput, humidityInput].forEach((input) => {
+    const describedBy = new Set((input.getAttribute("aria-describedby") || "").split(/\s+/).filter(Boolean));
+    describedBy.add("fieldInputError");
+    input.setAttribute("aria-describedby", [...describedBy].join(" "));
+  });
+
+  const originalRenderGuide = window.renderGuide;
+  if (typeof originalRenderGuide === "function") {
+    window.renderGuide = function renderGuideWithAutomaticFieldCopy() {
+      originalRenderGuide();
+      if (state.source === "field" && state.fieldValue === null) {
+        const guideSummary = document.querySelector("#guideSummary");
+        if (guideSummary) guideSummary.textContent = "현장 온도와 습도를 입력하면 계산 결과가 자동으로 반영됩니다.";
+      }
+    };
+  }
+
+  let debounceTimer = 0;
+
+  const showError = (message) => {
+    error.textContent = message;
+    error.hidden = false;
+    status.textContent = "입력값 확인 필요";
+    tempInput.setAttribute("aria-invalid", "true");
+    humidityInput.setAttribute("aria-invalid", "true");
+  };
+
+  const clearError = () => {
+    error.textContent = "";
+    error.hidden = true;
+    tempInput.removeAttribute("aria-invalid");
+    humidityInput.removeAttribute("aria-invalid");
+  };
+
+  const applyFieldValues = () => {
+    const rawTemp = tempInput.value.trim();
+    const rawHumidity = humidityInput.value.trim();
+
+    if (!rawTemp || !rawHumidity) {
+      showError("현장 온도와 상대습도를 모두 입력해주세요.");
+      return;
+    }
+
+    const temp = Number(rawTemp);
+    const humidity = Number(rawHumidity);
+
+    if (!Number.isFinite(temp) || !Number.isFinite(humidity)) {
+      showError("숫자 형식으로 입력해주세요.");
+      return;
+    }
+    if (temp < -20 || temp > 60) {
+      showError("현장 온도는 -20℃에서 60℃ 사이로 입력해주세요.");
+      return;
+    }
+    if (humidity < 0 || humidity > 100) {
+      showError("상대습도는 0%에서 100% 사이로 입력해주세요.");
+      return;
+    }
+
+    const apparent = heatIndex(temp, humidity);
+    if (!Number.isFinite(apparent)) {
+      showError("입력값으로 체감온도를 계산할 수 없습니다.");
+      return;
+    }
+
+    clearError();
+    const level = getLevel(apparent);
+    const changed = state.fieldTemp !== temp || state.fieldRh !== humidity || state.fieldValue !== apparent;
+
+    state.fieldValue = apparent;
+    state.fieldTemp = temp;
+    state.fieldRh = humidity;
+    state.fieldAppliedAt = new Date();
+    state.appliedSource = "field";
+
+    result.textContent = `${apparent.toFixed(1)}℃ · ${level.name}`;
+    result.style.color = level.dark;
+    status.textContent = "입력값 자동 적용";
+
+    if (state.source === "field" && changed && typeof window.renderGuide === "function") {
+      window.renderGuide();
+    }
+  };
+
+  const scheduleFieldUpdate = () => {
+    window.clearTimeout(debounceTimer);
+    status.textContent = "입력 확인 중";
+    clearError();
+    debounceTimer = window.setTimeout(applyFieldValues, 400);
+  };
+
+  tempInput.addEventListener("input", scheduleFieldUpdate);
+  humidityInput.addEventListener("input", scheduleFieldUpdate);
+})();
