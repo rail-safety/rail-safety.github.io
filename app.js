@@ -7,96 +7,47 @@ const stationData = {
 };
 
 const levels = [
-  { min: 38, key: "extreme", name: "매우 위험", color: "#7f1d1d", dark: "#571313", soft: "#fcecec", symbol: "!", rank: 4 },
-  { min: 35, key: "danger", name: "위험", color: "#c72c2c", dark: "#8f1e1e", soft: "#fff0f0", symbol: "!", rank: 3 },
-  { min: 33, key: "warning", name: "경고", color: "#c45600", dark: "#8f3e00", soft: "#fff1e5", symbol: "!", rank: 2 },
-  { min: 31, key: "caution", name: "주의", color: "#9a6500", dark: "#6f4900", soft: "#fff7df", symbol: "!", rank: 1 },
-  { min: -99, key: "normal", name: "안전", color: "#17834b", dark: "#0d6538", soft: "#e9f6ef", symbol: "✓", rank: 0 }
+  { min: 38, key: "danger", name: "위험 수준", color: "#662633", dark: "#401820", soft: "#c17b86", symbol: "!", rank: 4 },
+  { min: 35, key: "warning", name: "경고 수준", color: "#a65332", dark: "#66321e", soft: "#d89b72", symbol: "!", rank: 3 },
+  { min: 33, key: "caution", name: "주의 수준", color: "#956b24", dark: "#5e4216", soft: "#dec787", symbol: "!", rank: 2 },
+  { min: 31, key: "interest", name: "관심 수준", color: "#4f6f5e", dark: "#30483b", soft: "#cbd8d0", symbol: "!", rank: 1 },
+  { min: -99, key: "normal", name: "관심 미만", color: "#587080", dark: "#344955", soft: "#d5dfe4", symbol: "✓", rank: 0 }
 ];
 
 const guides = {
   normal: {
-    summary: "기본 예방수칙을 지키며 업무를 수행하세요.",
-    yard: [
-      "쿨토시, 넥쿨러 등 온열질환 예방용품 준비",
-      "입환 시작 전 불필요한 옥외 대기시간 최소화",
-      "작업 종료 후 실내 또는 그늘로 이동"
-    ],
-    platform: [
-      "적절한 시간에 승강장으로 이동",
-      "안내 및 대기 중 그늘 이용",
-      "안내와 안내 사이 실내 복귀"
-    ]
+    summary: "기본 예방수칙을 준비하고 체감온도 변화를 확인하세요.",
+    yard: ["작업 전 물·온열질환 예방용품 준비", "불필요한 옥외 대기와 이동 최소화", "작업 후 실내 또는 그늘에서 몸 상태 확인"],
+    platform: ["안내 전 물·온열질환 예방용품 준비", "승강장 대기 시 차양·그늘 우선 이용", "안내 사이 실내 복귀 및 몸 상태 확인"]
+  },
+  interest: {
+    summary: "폭염안전 5대 기본수칙을 적용하고 적절한 냉방휴식을 확보하세요.",
+    yard: ["시원한 물과 냉방·그늘 휴식공간 확보", "폭염 집중 시간대 작업 최소화 및 작업시간 조정 검토", "냉각조끼·넥쿨러 등 개인 보냉장구 준비", "작업 전후 본인과 동료의 온열질환 증상 확인"],
+    platform: ["시원한 물과 실내·그늘 휴식공간 확보", "안내 전 대기시간과 안내 후 승강장 체류 최소화", "냉각조끼·넥쿨러 등 개인 보냉장구 준비", "연속 안내 시 교대 또는 적절한 냉방휴식 확보"]
   },
   caution: {
-    summary: "옥외 체류시간을 줄이고 작업 사이에 몸을 식히세요.",
-    yard: [
-      "작업 동선·역할 사전 확인 및 옥외 체류시간 단축",
-      "작업 사이 대기 및 불필요한 이동 최소화",
-      "작업 사이 실내 또는 냉방장소에서 냉각·휴식"
-    ],
-    platform: [
-      "안내 및 대기 중 그늘 이용",
-      "안내 종료 후 실내 또는 냉방장소 복귀",
-      "장시간 연속 홈안내 시 교대 또는 냉방휴식 확보"
-    ]
+    summary: "매 2시간 이내 20분 이상 휴식하고 작업시간을 조정하세요.",
+    yard: ["매 2시간 이내 20분 이상 냉방·그늘 휴식", "작업시간대 조정 또는 옥외작업 단축", "온열질환 민감군·고강도 작업자는 휴식 추가", "2인 이상 상호 말투·걸음·반응 확인"],
+    platform: ["매 2시간 이내 20분 이상 냉방·그늘 휴식", "승강장 안내시간 단축 및 실내 복귀 동선 확보", "연속 안내 전 교대자와 휴식시간 지정", "온열질환 민감군·고강도 업무 담당자는 휴식 추가"]
   },
   warning: {
-    summary: "작업 순서와 휴식계획을 확인하고 냉방휴식을 확보하세요.",
-    yard: [
-      "작업 전 작업 순서·휴식계획 관리자 확인",
-      "2인 이상 작업 및 상호 말투·걸음·반응 확인",
-      "작업 단위 단축 및 선로 주변 대기시간 최소화",
-      "작업 종료 후 즉시 냉방장소에서 냉각·휴식"
-    ],
-    platform: [
-      "안내 위치·대기 위치·실내 복귀 동선 사전 확인",
-      "안내 전 차양·그늘 대기 및 안내 종료 후 실내 복귀",
-      "연속 홈안내 예정 시 교대자·냉방휴식 시간 사전 지정",
-      "인턴사원 안내 구간·복귀 동선 확인 및 장시간 단독 옥외체류 방지"
-    ]
+    summary: "매시간 15분 휴식하고 무더위 시간대 옥외작업을 조정·중지하세요.",
+    yard: ["매시간 15분씩 냉방·그늘 휴식", "무더위 시간대에는 불가피한 경우 외 옥외작업 중지", "불가피한 작업은 최소 인원·최단시간 수행하고 휴식 충분히 부여", "담당자를 지정해 작업자의 건강상태 확인"],
+    platform: ["매시간 15분씩 냉방·그늘 휴식", "무더위 시간대 안내 인원·시간 조정 및 옥외 대기 제거", "연속 안내를 피하고 교대자·실내 복귀시간 지정", "담당자가 안내 직원과 인턴사원의 건강상태 확인"]
   },
   danger: {
-    summary: "현재 시행하려는 업무가 즉시 필요한지, 연기 가능한지 관리자와 먼저 확인하세요.",
-    yard: [
-      "연기 가능한 업무 조정 및 반드시 필요한 업무만 시행",
-      "역할·동선 실내 사전 정리 및 옥외 체류시간 단축",
-      "2인 이상 상호 상태 확인 및 최소 인원·최단시간 작업",
-      "작업 종료 후 즉시 냉방장소 이동 및 충분한 냉각·휴식"
-    ],
-    platform: [
-      "안내 동선·대기 위치·실내 복귀 경로 사전 확인",
-      "안내 전 대기시간 및 안내 종료 후 홈 체류시간 최소화",
-      "연속 안내 예정 시 교대자·냉방휴식 시간 사전 지정",
-      "인턴사원 안내 동선·옥외 체류시간 확인 및 무리한 연속 안내 방지",
-      "어지럼·메스꺼움·반응 저하 발생 시 즉시 교대"
-    ]
-  },
-  extreme: {
-    summary: "업무가 긴급하거나 반드시 필요한지 관리자와 확인하세요. 연기 가능한 업무는 시행하지 않습니다.",
-    yard: [
-      "반드시 필요한 업무만 최소 인원·최단시간 수행",
-      "2인 이상 상호 상태 지속 확인 및 단독 행동 금지",
-      "보냉장구·연락수단 준비 및 옥외 대기시간 제거",
-      "말투·걸음·반응 이상 시 즉시 작업 중지",
-      "작업 종료 후 즉시 냉방장소 이동"
-    ],
-    platform: [
-      "이동·대기·복귀 동선 사전 확인 및 옥외 체류시간 최소화",
-      "연속 홈안내 방지를 위한 교대자·업무 조정",
-      "인턴사원 단독 장시간 안내 방지 및 담당 직원 상태 확인",
-      "평소와 다른 몸 상태 발생 시 즉시 교대",
-      "의식·말투·걸음 이상 시 즉시 냉방장소 이동 및 응급조치"
-    ]
+    summary: "재난·안전관리에 필요한 긴급조치 외 옥외작업을 중지하세요.",
+    yard: ["재난·안전관리에 필요한 긴급조치 외 옥외작업 중지", "긴급작업도 최소 인원·최단시간 수행하고 휴식 충분히 부여", "온열질환 민감군의 옥외작업 제한", "보냉장구·연락수단 확보 및 담당자의 건강상태 지속 확인", "말투·걸음·의식 이상 시 즉시 작업 중지 및 119 신고"],
+    platform: ["재난·안전관리에 필요한 긴급 안내 외 옥외업무 최소화", "긴급 안내 시 교대 운영하고 냉방휴식 충분히 부여", "온열질환 민감군의 장시간 승강장 업무 제한", "담당자가 직원·인턴사원의 건강상태 지속 확인", "말투·걸음·의식 이상 시 즉시 교대·냉각 및 119 신고"]
   }
 };
 
 const forecastAdvice = {
-  normal: "물과 온열질환 예방용품을 준비하고 기본 예방수칙을 유지하세요.",
-  caution: "그늘·냉방 휴식장소를 미리 확인하고 옥외 체류시간을 줄이세요.",
-  warning: "휴식계획과 교대계획을 미리 확인하고 냉방휴식을 확보하세요.",
-  danger: "연기 가능한 업무를 조정하고 물·휴식장소·교대계획을 미리 확인하세요.",
-  extreme: "필수업무 여부를 관리자와 확인하고 보냉조치·교대·응급연락을 준비하세요."
+  normal: "기본 예방수칙을 준비하고 이후 체감온도 변화를 확인하세요.",
+  interest: "물·냉방휴식 장소·보냉장구를 준비하고 폭염 집중 시간대 노출을 줄이세요.",
+  caution: "매 2시간 이내 20분 이상 휴식하고 작업시간 조정·교대계획을 확인하세요.",
+  warning: "매시간 15분 휴식하고 무더위 시간대 옥외작업 조정·중지를 준비하세요.",
+  danger: "긴급조치 외 옥외작업을 중지하고 보냉·교대·응급연락체계를 확인하세요."
 };
 
 const state = {
@@ -156,18 +107,13 @@ function applyGuideTheme(level) {
 }
 
 function renderHero() {
-  const usingField = state.appliedSource === "field" && state.fieldValue !== null;
-  const value = usingField ? state.fieldValue : state.autoValue;
-  const temp = usingField ? state.fieldTemp : state.autoTemp;
-  const humidity = usingField ? state.fieldRh : state.autoRh;
-  const observed = usingField ? state.fieldAppliedAt : state.autoObserved;
-  const sourceName = usingField ? "현장 입력값" : "기상청 실황";
-  const locationText = usingField
-    ? `${stationData[state.station].name} 현장 측정값`
-    : `${stationData[state.station].name} 인근 자동값`;
+  const value = state.autoValue;
+  const temp = state.autoTemp;
+  const humidity = state.autoRh;
+  const observed = state.autoObserved;
 
-  $("#heroLocation").textContent = locationText;
-  $("#heroSource").textContent = sourceName;
+  $("#heroLocation").textContent = `${stationData[state.station].name} 인근 자동값`;
+  $("#heroSource").textContent = "기상청 실황";
 
   if (value === null) {
     $("#currentTemp").innerHTML = '--<span>℃</span>';
@@ -187,10 +133,8 @@ function renderHero() {
   $("#currentAction").textContent = guides[level.key].summary;
   $("#heroTemp").textContent = `기온 ${Number.isFinite(temp) ? temp.toFixed(1) : "--"}℃`;
   $("#heroHumidity").textContent = `습도 ${Number.isFinite(humidity) ? Math.round(humidity) : "--"}%`;
-  $("#heroObserved").textContent = usingField ? `${formatTime(observed)} 적용` : `${formatTime(observed)} 관측`;
-  $("#updated").textContent = usingField
-    ? `현장값 ${formatTime(state.fieldAppliedAt, true)} 적용`
-    : `${formatTime(state.generatedAt, true)} 기상자료 갱신`;
+  $("#heroObserved").textContent = `${formatTime(observed)} 관측`;
+  $("#updated").textContent = `${formatTime(state.generatedAt, true)} 기상자료 갱신`;
 }
 
 async function loadWeather() {
@@ -214,7 +158,7 @@ async function loadWeather() {
     state.autoObserved = row.time;
     state.generatedAt = data.generatedAt || Date.now();
     state.hourly = station.hourly.map((item) => ({ time: item.time, temp: Number(item.temp), rh: Number(item.rh), hi: Number(item.hi) }));
-    $("#weatherMeta").textContent = `${stationData[state.station].name} 인근 기상청 초단기실황과 여름철 체감온도 산식을 적용한 참고값입니다. 실제 작업 판단은 현장 측정값과 회사 지침을 우선합니다.`;
+    $("#weatherMeta").textContent = "시간별 체감온도 수치가 어느 구간에 해당하는지 보여주는 참고 표시입니다. 기상청 공식 폭염 영향예보는 일 최고 체감온도·지속일수·분야별 영향을 종합해 별도로 발표합니다. 실제 작업 판단은 현장 측정값과 회사 지침을 우선합니다.";
     $("#headerStatus").textContent = "기상 연동 정상";
     renderHero();
     renderForecast();
