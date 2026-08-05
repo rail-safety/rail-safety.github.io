@@ -31,7 +31,7 @@
 
     const highest = rows.reduce((max, item) => item.hi > max.hi ? item : max, rows[0]);
     const highestLevel = getLevel(highest.hi);
-    const currentLevel = state.autoValue === null ? null : getLevel(state.autoValue);
+    const currentLevel = state.autoValue === null || state.autoStale ? null : getLevel(state.autoValue);
     const peakTime = new Date(highest.time);
     const trend = currentLevel && highestLevel.rank > currentLevel.rank
       ? `${currentLevel.name} → ${highestLevel.name} 상승 예상`
@@ -126,17 +126,6 @@
     input.setAttribute("aria-describedby", [...describedBy].join(" "));
   });
 
-  const originalRenderGuide = window.renderGuide;
-  if (typeof originalRenderGuide === "function") {
-    window.renderGuide = function renderGuideWithAutomaticFieldCopy() {
-      originalRenderGuide();
-      if (state.source === "field" && state.fieldValue === null) {
-        const guideSummary = document.querySelector("#guideSummary");
-        if (guideSummary) guideSummary.textContent = "현장 온도와 습도를 입력하면 계산 결과가 자동으로 반영됩니다.";
-      }
-    };
-  }
-
   let debounceTimer = 0;
 
   const showError = (message) => {
@@ -213,4 +202,114 @@
 
   tempInput.addEventListener("input", scheduleFieldUpdate);
   humidityInput.addEventListener("input", scheduleFieldUpdate);
+})();
+
+(() => {
+  const STALE_OBSERVATION_MS = 2 * 60 * 60 * 1000;
+
+  const isObservationStale = () => {
+    const observedAt = state.autoObserved ? new Date(state.autoObserved) : null;
+    return !observedAt || Number.isNaN(observedAt.getTime())
+      ? false
+      : Date.now() - observedAt.getTime() > STALE_OBSERVATION_MS;
+  };
+
+  const sourceChip = document.querySelector("#heroSource");
+  if (sourceChip) sourceChip.hidden = true;
+
+  const nightShiftLabel = document.querySelector('[data-shift="night"] span');
+  if (nightShiftLabel) nightShiftLabel.textContent = "18:00~익일 09:00";
+
+  window.renderHero = function renderFreshnessAwareHero() {
+    const value = state.autoValue;
+    const temp = state.autoTemp;
+    const humidity = state.autoRh;
+    const observed = state.autoObserved;
+    const stale = value !== null && isObservationStale();
+    state.autoStale = stale;
+
+    const location = document.querySelector("#heroLocation");
+    const title = document.querySelector("#current-status-title");
+    const headerStatus = document.querySelector("#headerStatus");
+    const weatherMeta = document.querySelector("#weatherMeta");
+
+    if (location) location.textContent = `${stationData[state.station].name} 인근 기상청 관측값`;
+    if (title) title.textContent = stale ? "최근 관측 체감온도" : "현재 체감온도";
+
+    if (value === null) {
+      $("#currentTemp").innerHTML = '--<span>℃</span>';
+      $("#currentBadge").innerHTML = '<span class="hero__level-icon" aria-hidden="true">·</span><strong>확인 중</strong>';
+      $("#currentAction").textContent = "기상정보를 확인하고 있습니다.";
+      $("#heroTemp").textContent = "기온 --℃";
+      $("#heroHumidity").textContent = "습도 --%";
+      $("#heroObserved").textContent = "관측시각 확인 중";
+      $("#updated").textContent = "최근 갱신정보 확인 중";
+      return;
+    }
+
+    if (stale) {
+      $(".hero").style.setProperty("--hero-risk", "#9a6b20");
+      $("#currentTemp").innerHTML = `${value.toFixed(1)}<span>℃</span>`;
+      $("#currentBadge").innerHTML = '<span class="hero__level-icon" aria-hidden="true">!</span><strong>갱신 지연</strong>';
+      $("#currentAction").textContent = "관측값이 2시간 이상 지났습니다. 현장 측정값을 우선하세요.";
+      $("#heroTemp").textContent = `기온 ${Number.isFinite(temp) ? temp.toFixed(1) : "--"}℃`;
+      $("#heroHumidity").textContent = `습도 ${Number.isFinite(humidity) ? Math.round(humidity) : "--"}%`;
+      $("#heroObserved").textContent = `${formatTime(observed)} 관측 · 갱신 지연`;
+      $("#updated").textContent = `${formatTime(state.generatedAt, true)} 자료 생성`;
+      if (headerStatus) headerStatus.textContent = "기상자료 갱신 지연";
+      if (weatherMeta) weatherMeta.textContent = "자동 관측자료가 2시간 이상 갱신되지 않았습니다. 현장 온·습도계 측정값과 회사 지침을 우선 적용하세요.";
+      return;
+    }
+
+    const level = getLevel(value);
+    $(".hero").style.setProperty("--hero-risk", level.color);
+    $("#currentTemp").innerHTML = `${value.toFixed(1)}<span>℃</span>`;
+    $("#currentBadge").innerHTML = `<span class="hero__level-icon" aria-hidden="true">${level.symbol}</span><strong>${level.name}</strong>`;
+    $("#currentAction").textContent = guides[level.key].summary;
+    $("#heroTemp").textContent = `기온 ${Number.isFinite(temp) ? temp.toFixed(1) : "--"}℃`;
+    $("#heroHumidity").textContent = `습도 ${Number.isFinite(humidity) ? Math.round(humidity) : "--"}%`;
+    $("#heroObserved").textContent = `${formatTime(observed)} 관측`;
+    $("#updated").textContent = `${formatTime(state.generatedAt, true)} 기상자료 갱신`;
+    if (headerStatus) headerStatus.textContent = "기상 연동 정상";
+  };
+
+  window.renderGuide = function renderFreshnessAwareGuide() {
+    const staleAuto = state.source === "auto" && isObservationStale();
+    const value = state.source === "field" ? state.fieldValue : (staleAuto ? null : state.autoValue);
+    const sourceLabel = state.source === "field" ? "현장 입력값" : "기상 자동값";
+    const jobLabel = state.job === "yard" ? "수송" : "홈안내";
+    $("#guideContext").textContent = `${jobLabel} · ${sourceLabel}`;
+    $("#fieldPanel").hidden = state.source !== "field";
+
+    if (value === null) {
+      applyGuideTheme({ color: "#70808b", dark: "#46555f", soft: "#eef1f3" });
+      if (staleAuto) {
+        $("#guideStatus").textContent = "기상자료 갱신 지연";
+        $("#guideSummary").textContent = "오래된 자동값은 행동지침에 적용하지 않습니다. 현장 입력값을 선택하세요.";
+      } else {
+        $("#guideStatus").textContent = state.source === "field" ? "현장값 입력 필요" : "기상정보 확인 중";
+        $("#guideSummary").textContent = state.source === "field"
+          ? "현장 온도와 습도를 입력하면 계산 결과가 자동으로 반영됩니다."
+          : "값이 준비되면 현재 단계의 핵심 지침이 표시됩니다.";
+      }
+      $("#keyList").innerHTML = "";
+      renderHomeSupport();
+      return;
+    }
+
+    const level = getLevel(value);
+    const guide = guides[level.key];
+    applyGuideTheme(level);
+    $("#guideStatus").textContent = `체감 ${value.toFixed(1)}℃ · ${level.name}`;
+    $("#guideSummary").textContent = guide.summary;
+    $("#keyList").innerHTML = guide[state.job].map((item, index) => `<li class="guide-item">
+      <span class="guide-number">${String(index + 1).padStart(2, "0")}</span>
+      <span class="guide-text">${item}</span>
+    </li>`).join("");
+    renderHomeSupport();
+  };
+
+  renderHero();
+  renderGuide();
+  if (state.hourly.length > 0) renderForecast();
 })();
